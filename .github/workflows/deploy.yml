@@ -26,11 +26,11 @@ jobs:
     - name: Execute remote SSH commands
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
+        host: ${{ secrets.ES2_HOST }}
+        username: ${{ secrets.ES2_USER }}
         key: ${{ secrets.EC2_KEY }}
         port: 22
         script: |
-          cd /home/${{ secrets.EC2_USER }}/crm
+          cd /home/${{ secrets.ES2_USER }}/crm
           docker-compose down
           docker-compose up -d --build

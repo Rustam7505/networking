@@ -1,0 +1,331 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <!-- Stats Cards Row -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-chart">
+                <canvas id="salesChart1"></canvas>
+                <div class="stat-value">${{ today_sales|floatformat:0 }}</div>
+            </div>
+            <div class="stat-info">
+                <h3>TODAY'S SALES</h3>
+                <p>Daily revenue from all sales channels.</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-chart">
+                <canvas id="salesChart2"></canvas>
+                <div class="stat-value">${{ weekly_sales|floatformat:0 }}</div>
+            </div>
+            <div class="stat-info">
+                <h3>WEEKLY SALES</h3>
+                <p>Revenue for the current week.</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-chart">
+                <canvas id="salesChart3"></canvas>
+                <div class="stat-value">${{ monthly_sales|floatformat:0 }}</div>
+            </div>
+            <div class="stat-info">
+                <h3>MONTHLY SALES</h3>
+                <p>Revenue for the current month.</p>
+            </div>
+        </div>
+        
+        <div class="stat-card wide">
+            <div class="stat-info">
+                <h3>SALES OVERVIEW</h3>
+                <div class="percentage">{{ total_orders }}</div>
+                <p>Total number of orders in the system.</p>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 64%; background-color: #00ffff;"></div>
+                </div>
+                <p>{{ active_orders }} active orders currently being processed.</p>
+            </div>
+        </div>
+        
+        <div class="stat-card wide">
+            <div class="stat-info">
+                <h3>INVENTORY STATUS</h3>
+                <p>Total Products: {{ total_products }}</p>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 75%; background-color: #ff6b6b;"></div>
+                </div>
+                <p>Low Stock Items: {{ low_stock_products }}</p>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 45%; background-color: #ff9f43;"></div>
+                </div>
+                <p>Total Customers: {{ total_customers }}</p>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 90%; background-color: #00d2d3;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts Row -->
+    <div class="charts-row">
+        <div class="chart-card">
+            <canvas id="lineChart"></canvas>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-container">
+                <div class="bar-chart">
+                    {% for category in sales_by_category|slice:":5" %}
+                    <div class="bar-item">
+                        <div class="bar-label">{{ category.product__category__name }}</div>
+                        <div class="bar-container">
+                            <div class="bar" style="width: {{ category.total_revenue|floatformat:0 }}%; background-color: 
+                                {% cycle '#ff6b6b' '#48dbfb' '#1dd1a1' '#feca57' '#ff9ff3' %};">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="chart-info">
+                <h3>SALES BY CATEGORY</h3>
+                <p>Distribution of sales across different product categories.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Orders and Customers -->
+    <div class="activities-row">
+        <div class="activities-card">
+            <h3>RECENT ORDERS</h3>
+            <div class="activities-list">
+                {% for order in recent_orders %}
+                <div class="activity-item">
+                    <div class="activity-header">
+                        <span class="activity-title">{{ order.order_number }}</span>
+                        <span class="activity-date">{{ order.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <p>{{ order.customer.name }} - ${{ order.total_amount|floatformat:2 }}</p>
+                    <span class="status-badge {{ order.status }}">{{ order.get_status_display }}</span>
+                </div>
+                {% empty %}
+                <div class="activity-item">
+                    <p>No recent orders found.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="activities-card">
+            <h3>RECENT CUSTOMERS</h3>
+            <div class="activities-list">
+                {% for customer in recent_customers %}
+                <div class="activity-item">
+                    <div class="activity-header">
+                        <span class="activity-title">{{ customer.name }}</span>
+                        <span class="activity-date">{{ customer.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <p>{{ customer.email|default:"No email provided" }}</p>
+                    <span class="status-badge {{ customer.status }}">{{ customer.get_status_display }}</span>
+                </div>
+                {% empty %}
+                <div class="activity-item">
+                    <p>No recent customers found.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="metrics-card">
+            <div class="metrics-container">
+                <div class="metric-item">
+                    <div class="metric-chart">
+                        <canvas id="doughnutChart1"></canvas>
+                        <div class="metric-value">{{ active_orders }}</div>
+                    </div>
+                    <div class="metric-label">Active Orders</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-chart">
+                        <canvas id="doughnutChart2"></canvas>
+                        <div class="metric-value">{{ total_customers }}</div>
+                    </div>
+                    <div class="metric-label">Customers</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-chart">
+                        <canvas id="doughnutChart3"></canvas>
+                        <div class="metric-value">{{ total_products }}</div>
+                    </div>
+                    <div class="metric-label">Products</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-chart">
+                        <canvas id="doughnutChart4"></canvas>
+                        <div class="metric-value">${{ total_sales|floatformat:0 }}</div>
+                    </div>
+                    <div class="metric-label">Total Sales</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-chart">
+                        <canvas id="doughnutChart5"></canvas>
+                        <div class="metric-value">{{ low_stock_products }}</div>
+                    </div>
+                    <div class="metric-label">Low Stock</div>
+                </div>
+            </div>
+            <div class="metrics-slider">
+                <input type="range" min="0" max="100" value="50" class="slider">
+                <div class="slider-labels">
+                    <span>Today</span>
+                    <span>Week</span>
+                    <span>Month</span>
+                    <span>Quarter</span>
+                    <span>Year</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Circular progress charts
+    function createDoughnutChart(canvasId, percentage, color) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        return new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [percentage, 100 - percentage],
+                    backgroundColor: [color, '#2a2a4a'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '75%',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                }
+            }
+        });
+    }
+    
+    // Line chart
+    function createLineChart() {
+        const ctx = document.getElementById('lineChart').getContext('2d');
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ months|safe }},
+                datasets: [
+                    {
+                        label: 'Monthly Sales',
+                        data: {{ monthly_data|safe }},
+                        borderColor: '#ff6b6b',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#aaa'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#aaa'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#aaa'
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Monthly Sales Trend',
+                        color: '#fff'
+                    }
+                }
+            }
+        });
+    }
+    
+    // Semi-circular charts
+    function createSemiCircleChart(canvasId, percentage, color) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        return new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [percentage, 100 - percentage],
+                    backgroundColor: [color, 'rgba(255, 255, 255, 0.1)'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                circumference: 180,
+                rotation: -90,
+                cutout: '70%',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                }
+            }
+        });
+    }
+    
+    // Initialize all charts when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create doughnut charts
+        createDoughnutChart('doughnutChart1', 40, '#ff6b6b');
+        createDoughnutChart('doughnutChart2', 75, '#48dbfb');
+        createDoughnutChart('doughnutChart3', 20, '#1dd1a1');
+        createDoughnutChart('doughnutChart4', 80, '#feca57');
+        createDoughnutChart('doughnutChart5', 60, '#ff9ff3');
+        
+        // Create semi-circle charts
+        createSemiCircleChart('salesChart1', 70, '#00d2d3');
+        createSemiCircleChart('salesChart2', 85, '#ff9f43');
+        createSemiCircleChart('salesChart3', 60, '#ee5253');
+        
+        // Create line chart
+        createLineChart();
+    });
+</script>
+{% endblock %}

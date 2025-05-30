@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+{% block title %}Add stock{% endblock %}
+{% block breadcrumb %}{% include 'core/breadcrumb.html' with here='Add stock' %}{% endblock %}
+
+{% load inventory_extras %}
+
+{% block content %}
+<h2 class="mb-3">Add inventory</h2>
+
+<form method="post" class="card card-body shadow-sm col-lg-6">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn btn-primary">Save</button>
+  <a href="{% url 'inventory:list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+{% load report_extras %}   {#  ← qo‘shimcha #}
+{% block title %}Inventory report – {{ report_date }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">Inventory report – {{ report_date }}</h2>
+
+<table class="table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>#</th><th>Product</th>
+      <th class="text-end">Opening</th>
+      <th class="text-end">+ Added</th>
+      <th class="text-end">– Removed</th>
+      <th class="text-end">Closing</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for row in opening %}
+    {% with mov=movement|get_item:row.product_id %}
+    {% comment %} 'get_item' – template filter yozib qo‘ying yoki Python’da merge qiling {% endcomment %}
+    {% with
+         added=mov.added|default:0
+         removed=mov.removed|default:0
+         closing=row.opening_qty|add:added|add:removed %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ row.product__name }}</td>
+      <td class="text-end">{{ row.opening_qty|floatformat }}</td>
+      <td class="text-end text-success">{{ added|floatformat }}</td>
+      <td class="text-end text-danger">{{ removed|floatformat }}</td>
+      <td class="text-end fw-bold">{{ closing|floatformat }}</td>
+    </tr>
+    {% endwith %}
+  {% empty %}
+    <tr><td colspan="6" class="text-center py-4 text-muted">No data.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block breadcrumb %}
+    <span>&gt;</span> <a href="{% url 'products:list' %}">Products</a>
+    <span>&gt;</span> <span>{{ product.name }}</span>
+{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <div class="page-header">
+        <h2>Product Details</h2>
+        <div class="header-actions">
+            <a href="{% url 'products:update' product.id %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'products:delete' product.id %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+    </div>
+    
+    <div class="product-detail-card">
+        <div class="product-detail-image">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <div class="no-image">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+            {% endif %}
+        </div>
+        <div class="product-detail-info">
+            <h3>{{ product.name }}</h3>
+            <p class="product-category">Category: {{ product.category.name }}</p>
+            
+            <div class="info-section">
+                <h4>Basic Information</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Price:</span>
+                        <span class="info-value">${{ product.price }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Cost Price:</span>
+                        <span class="info-value">${{ product.cost_price }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Profit Margin:</span>
+                        <span class="info-value">{{ product.profit_margin|floatformat:2 }}%</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Stock:</span>
+                        <span class="info-value">{{ product.stock_quantity }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value status-badge {% if product.is_active %}active{% else %}inactive{% endif %}">
+                            {% if product.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h4>Product Attributes</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Size:</span>
+                        <span class="info-value">{{ product.get_size_display }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Color:</span>
+                        <span class="info-value">{{ product.color }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Gender:</span>
+                        <span class="info-value">{{ product.get_gender_display }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            {% if product.description %}
+            <div class="info-section">
+                <h4>Description</h4>
+                <p>{{ product.description }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="info-section">
+                <h4>Timestamps</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Created:</span>
+                        <span class="info-value">{{ product.created_at|date:"F j, Y, g:i a" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Last Updated:</span>
+                        <span class="info-value">{{ product.updated_at|date:"F j, Y, g:i a" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

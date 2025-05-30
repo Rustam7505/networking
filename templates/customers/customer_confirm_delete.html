@@ -1,0 +1,31 @@
+{# customers/templates/customers/customer_confirm_delete.html #}
+{% extends 'core/base.html' %}
+
+{% block title %}
+    Delete {{ customer.name }}?
+{% endblock %}
+
+{% block breadcrumb %}
+    <span>&gt;</span> <a href="{% url 'customers:customer_list' %}">Customers</a>
+    <span>&gt;</span> Delete
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="text-danger">Delete customer</h2>
+
+    <p>Do you really want to delete <strong>{{ customer.name }}</strong>?
+       This action <em>cannot</em> be undone.</p>
+
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+
+        <a href="{% url 'customers:customer_detail' customer.pk %}"
+           class="btn btn-secondary">Cancel</a>
+
+        <button type="submit" class="btn btn-danger">
+            Yes, delete
+        </button>
+    </form>
+</div>
+{% endblock %}

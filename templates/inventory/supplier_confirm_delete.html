@@ -1,0 +1,19 @@
+{% load inventory_extras %}
+
+{% extends 'core/base.html' %}
+{% block title %}Delete supplier{% endblock %}
+{% block breadcrumb %}{% include 'core/breadcrumb.html' with here='Delete' %}{% endblock %}
+
+
+{% block content %}
+<h2 class="text-danger mb-3">Delete “{{ supplier.name }}”?</h2>
+
+<p>Bu yetkazib beruvchini o‘chirib tashlasangiz, unga bog‘liq mahsulotlar saqlanib qoladi, lekin
+supplier maydoni bo‘sh bo‘ladi.</p>
+
+<form method="post">
+  {% csrf_token %}
+  <a href="{% url 'inventory:supplier_list' %}" class="btn btn-secondary">Cancel</a>
+  <button class="btn btn-danger">Yes, delete</button>
+</form>
+{% endblock %}

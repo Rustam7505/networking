@@ -1,0 +1,64 @@
+{% extends "core/base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block breadcrumb %}
+  {% include "core/breadcrumb.html" with here="Profile" %}
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">User profile</h2>
+
+<div class="card p-4 shadow-sm" style="max-width:720px">
+  <div class="d-flex align-items-center gap-4 mb-4">
+    {% if user.profile.avatar %}
+      <img src="{{ user.profile.avatar.url }}"
+           alt="{{ user.username }}"
+           class="rounded-circle shadow-sm"
+           style="width:128px;height:128px;object-fit:cover;">
+    {% else %}
+      <img src="{% static 'img/user-avatar.png' %}"
+           alt="avatar"
+           class="rounded-circle opacity-50"
+           style="width:128px;height:128px;">
+    {% endif %}
+
+    <div>
+      <h4 class="mb-1">{{ user.get_full_name|default:user.username }}</h4>
+      <p class="mb-0 text-muted small">{{ user.email }}</p>
+      <p class="mb-0 small">{{ user.profile.position|default:"—" }}</p>
+    </div>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="row g-3">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="col-md-6">
+      {{ form.first_name.label_tag }} {{ form.first_name }}
+    </div>
+    <div class="col-md-6">
+      {{ form.last_name.label_tag }} {{ form.last_name }}
+    </div>
+    <div class="col-md-6">
+      {{ form.email.label_tag }} {{ form.email }}
+    </div>
+    <div class="col-md-6">
+      {{ form.phone.label_tag }} {{ form.phone }}
+    </div>
+    <div class="col-md-6">
+      {{ form.position.label_tag }} {{ form.position }}
+    </div>
+    <div class="col-md-6">
+      {{ form.avatar.label_tag }} {{ form.avatar }}
+    </div>
+    <div class="col-12">
+      {{ form.bio.label_tag }} {{ form.bio }}
+    </div>
+
+    <div class="col-12 text-end mt-2">
+      <button type="submit" class="btn btn-primary px-4">Save</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

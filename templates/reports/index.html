@@ -1,0 +1,55 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Reports{% endblock %}
+
+{% block breadcrumb %}
+  {% include 'core/breadcrumb.html' with here='Reports' %}
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="m-0">Reports</h2>
+  <!-- Bu yerga istasangiz «Export» tugmasi yoki filtr qo‘shishingiz mumkin -->
+</div>
+
+<div class="row g-4">
+  <!-- Sotuv hisobotlari -->
+  <div class="col-md-4">
+    <a href="{% url 'reports:sales' %}" class="text-decoration-none">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-chart-line fa-2x mb-2 text-primary"></i>
+          <h5 class="card-title mb-0">Sales report</h5>
+          <p class="text-muted small mb-0">Orders, revenue, growth …</p>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Inventarizatsiya hisobotlari -->
+  <div class="col-md-4">
+    <a href="{% url 'reports:inventory' %}" class="text-decoration-none">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-warehouse fa-2x mb-2 text-success"></i>
+          <h5 class="card-title mb-0">Inventory report</h5>
+          <p class="text-muted small mb-0">Stock levels, turnover …</p>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Foyda va zarar -->
+  <div class="col-md-4">
+    <a href="{% url 'reports:profit' %}" class="text-decoration-none">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-coins fa-2x mb-2 text-warning"></i>
+          <h5 class="card-title mb-0">Profit & loss</h5>
+          <p class="text-muted small mb-0">Margin, expenses …</p>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+{% endblock %}

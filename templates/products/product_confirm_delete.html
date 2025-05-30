@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+
+{% block title %}“{{ product.name }}” ni o‘chirish{% endblock %}
+
+{% block breadcrumb %}
+  {% include "core/breadcrumb.html" with here="Delete product" %}
+{% endblock %}
+
+{% block content %}
+<div class="card p-4 shadow-sm" style="max-width:600px">
+  <h3 class="mb-3 text-danger">
+    “{{ product.name }}” mahsulotini o‘chirib tashlamoqchimisiz?
+  </h3>
+  <p class="text-muted mb-4">
+    Diqqat: bu amal qaytarib bo‘lmaydi!
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+    <a href="{% url 'products:detail' product.pk %}" class="btn btn-secondary">
+      Bekor qilish
+    </a>
+    <button type="submit" class="btn btn-danger">
+      Ha, o‘chir!
+    </button>
+  </form>
+</div>
+{% endblock %}

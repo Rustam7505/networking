@@ -1,0 +1,63 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if is_create %}Add order{% else %}Edit order{% endif %}{% endblock %}
+
+{% block content %}
+<h2>{% if is_create %}Add order{% else %}Edit order #{{ form.instance.id }}{% endif %}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    {{ formset.management_form }}   {# ← majburiy! #}
+
+    {# formset elementlari jadvali #}
+    ...
+
+
+  {# ---- FORMA XATOLARI ---- #}
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  {% for field in form %}
+    <div class="mb-3">
+      {{ field.label_tag }} {{ field }}
+      {% if field.errors %}
+          <div class="text-danger small">{{ field.errors|striptags }}</div>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  <h4 class="mt-4">Items</h4>
+  {{ formset.management_form }}
+
+  <table class="table">
+    <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>DELETE</th></tr></thead>
+    <tbody>
+      {% for f in formset %}
+        <tr>
+          <td>{{ f.product }} {% if f.product.errors %}<span class="text-danger small">{{ f.product.errors|striptags }}</span>{% endif %}</td>
+          <td>{{ f.quantity }} {% if f.quantity.errors %}<span class="text-danger small">{{ f.quantity.errors|striptags }}</span>{% endif %}</td>
+          <td>{{ f.price }} {% if f.price.errors %}<span class="text-danger small">{{ f.price.errors|striptags }}</span>{% endif %}</td>
+          <td>{{ f.DELETE }}</td>
+        </tr>
+        {% if f.non_field_errors %}
+          <tr><td colspan="4" class="text-danger small">{{ f.non_field_errors }}</td></tr>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if formset.non_form_errors %}
+    <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+  {% endif %}
+
+  <button class="btn btn-primary" type="submit">
+      {% if is_create %}Save{% else %}Update{% endif %}
+  </button>
+  <a class="btn btn-secondary" href="{% url 'orders:list' %}">Cancel</a>
+</form>
+{% endblock %}
+{% if formset.non_form_errors %}
+  <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+{% endif %}

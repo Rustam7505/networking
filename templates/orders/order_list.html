@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Orders{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active">Orders</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="m-0">Orders</h2>
+  <a class="btn btn-primary" href="{% url 'orders:create' %}">
+      <i class="fas fa-plus me-1"></i> Add order
+  </a>
+</div>
+
+<form class="row gy-2 gx-3 align-items-end mb-4" method="get">
+  <div class="col-md-4">
+      <label class="form-label fw-semibold">Search</label>
+      <input type="text" name="search" value="{{ request.GET.search }}"
+             class="form-control" placeholder="Customer name or ID">
+  </div>
+  <div class="col-md-3">
+      <label class="form-label fw-semibold">Status</label>
+      <select name="status" class="form-select">
+          <option value="">All statuses</option>
+          {% for code,label in status_choices %}
+            <option value="{{ code }}"
+                {% if selected_status == code %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+      </select>
+  </div>
+  <div class="col-md-auto">
+      <button class="btn btn-outline-secondary">
+         <i class="fas fa-filter me-1"></i> Filter
+      </button>
+  </div>
+</form>
+
+<div class="table-responsive">
+<table class="table table-hover align-middle">
+  <thead class="table-light">
+    <tr>
+      <th>#</th>
+      <th>Date</th>
+      <th>Customer</th>
+      <th class="text-end">Total</th>
+      <th>Status</th>
+      <th class="text-end">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for o in orders %}
+    <tr>
+      <td>{{ o.id }}</td>
+      <td>{{ o.created_at|date:"Y-m-d" }}</td>
+      <td>{{ o.customer }}</td>
+      <td class="text-end">{{ o.total_amount|floatformat:2 }}</td>
+      <td>
+        {% if o.status == 'new' %}
+           <span class="badge bg-secondary">New</span>
+        {% elif o.status == 'proc' %}
+           <span class="badge bg-info">Processing</span>
+        {% elif o.status == 'ship' %}
+           <span class="badge bg-warning text-dark">Shipped</span>
+        {% elif o.status == 'done' %}
+           <span class="badge bg-success">Completed</span>
+        {% else %}
+           <span class="badge bg-danger">Canceled</span>
+        {% endif %}
+      </td>
+      <td class="text-end">
+        <a href="{% url 'orders:detail' o.pk %}" class="btn btn-sm btn-outline-info" title="View">
+            <i class="fas fa-eye"></i>
+        </a>
+        <a href="{% url 'orders:update' o.pk %}" class="btn btn-sm btn-outline-primary" title="Edit">
+            <i class="fas fa-edit"></i>
+        </a>
+        <a href="{% url 'orders:delete' o.pk %}" class="btn btn-sm btn-outline-danger" title="Delete">
+            <i class="fas fa-trash-alt"></i>
+        </a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr>
+      <td colspan="6" class="text-center py-4 text-muted">No orders found.</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ object|default:'New item' }}{% endblock %}
+{% block content %}
+{% load inventory_extras %}
+
+  <h2>{{ object|default:'Add item' }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary">Save</button>
+    <a href="{{ cancel_url }}" class="btn btn-secondary">Cancel</a>
+  </form>
+{% endblock %}

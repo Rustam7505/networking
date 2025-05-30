@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+{% block title %}Product report{% endblock %}
+{% block breadcrumb %}{% include 'core/breadcrumb.html' with here='Product report' %}{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">Product report</h2>
+
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead class="table-light small">
+      <tr>
+        <th>#</th><th>Product</th>
+        <th class="text-end">Units&nbsp;sold</th>
+        <th class="text-end">Revenue</th>
+        <th class="text-end">Stock&nbsp;left</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for p in products %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ p.name }}</td>
+        <td class="text-end">{{ p.units_sold }}</td>
+        <td class="text-end">{{ p.revenue|floatformat:2 }}</td>
+        <td class="text-end">{{ p.stock }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="text-center py-4 text-muted">No data.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

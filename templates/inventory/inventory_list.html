@@ -1,0 +1,36 @@
+{% extends 'core/base.html' %}
+{% block title %}Inventory{% endblock %}
+{% block breadcrumb %}{% include 'core/breadcrumb.html' with here='Inventory' %}{% endblock %}
+
+{% load inventory_extras %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="m-0">Inventory</h2>
+  <a href="{% url 'inventory:add' %}" class="btn btn-primary">
+     <i class="fas fa-plus me-1"></i> Add stock
+  </a>
+</div>
+
+<div class="table-responsive">
+<table class="table table-hover align-middle">
+  <thead class="table-light">
+    <tr><th>#</th><th>Product</th><th class="text-end">Qty</th><th>Updated</th></tr>
+  </thead>
+  <tbody>
+  {% for row in items %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>
+         <a href="{% url 'inventory:history' row.product.id %}">{{ row.product }}</a>
+      </td>
+      <td class="text-end">{{ row.quantity }}</td>
+      <td>{{ row.updated_at|date:"Y-m-d H:i" }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="4" class="text-center py-4 text-muted">No inventory data.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+{% block title %}Inventory history{% endblock %}
+{% block breadcrumb %}{% include 'core/breadcrumb.html' with here='History' %}{% endblock %}
+{% load inventory_extras %}
+
+
+{% block content %}
+<h2 class="mb-3">{% load inventory_extras %}
+
+  {% if product %}History – {{ product }}{% else %}Inventory history{% endif %}
+</h2>
+
+<div class="table-responsive">
+<table class="table table-striped align-middle">
+  <thead class="table-light">
+    <tr>
+      <th>#</th><th>Date</th><th>{% if not product %}Product{% endif %}</th>
+      <th class="text-end">Δ Qty</th><th>Note</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for h in history %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ h.timestamp|date:"Y-m-d H:i" }}</td>
+      {% if not product %}<td>{{ h.product }}</td>{% endif %}
+      <td class="text-end {{ h.change|intgte:0|yesno:'text-success,text-danger' }}">
+         {{ h.change|floatformat:0 }}
+      </td>
+      <td>{{ h.note|default:"—" }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5" class="text-center py-4 text-muted">No history.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

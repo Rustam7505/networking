@@ -1,0 +1,28 @@
+{# customers/templates/customers/customer_detail.html #}
+{% extends 'core/base.html' %}
+
+{% block title %}
+    {{ customer.name }} — Customer Detail
+{% endblock %}
+
+{% block breadcrumb %}
+    <span>&gt;</span> <a href="{% url 'customers:customer_list' %}">Customers</a>
+    <span>&gt;</span> {{ customer.name }}
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ customer.name }}</h2>
+
+    <ul class="list-unstyled">
+        <li><strong>Email:</strong> {{ customer.email }}</li>
+        <li><strong>Telefon:</strong> {{ customer.phone }}</li>
+        <li><strong>Address:</strong> {{ customer.address }}</li>
+        <li><strong>Status:</strong> {{ customer.get_status_display }}</li>
+        <!-- modelda qaysi maydonlar bo‘lsa, shu yerda ko‘rsating -->
+    </ul>
+
+    <a href="{% url 'customers:customer_update' customer.pk %}" class="btn btn-primary">Edit</a>
+    <a href="{% url 'customers:customer_delete' customer.pk %}" class="btn btn-danger">Delete</a>
+</div>
+{% endblock %}

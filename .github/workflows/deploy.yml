@@ -16,21 +16,21 @@ jobs:
     - name: Copy files to server via SSH
       uses: appleboy/scp-action@v0.1.4
       with:
-        host: ${{ secrets.ES2_HOST }}
-        username: ${{ secrets.ES2_USER }}
-        key: ${{ secrets.ES2_KEY }}
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
         port: 22
         source: "."
-        target: "/home/${{ secrets.ES2_USER }}/crm"
+        target: "/home/${{ secrets.EC2_USER }}/crm"
 
     - name: Execute remote SSH commands
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.ES2_HOST }}
-        username: ${{ secrets.ES2_USER }}
-        key: ${{ secrets.ES2_KEY }}
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
         port: 22
         script: |
-          cd /home/${{ secrets.ES2_USER }}/crm
+          cd /home/${{ secrets.EC2_USER }}/crm
           docker-compose down
           docker-compose up -d --build

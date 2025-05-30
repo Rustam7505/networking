@@ -10,4 +10,4 @@ echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
 echo "Starting Gunicorn..."
-exec gunicorn NewAssigment.wsgi:application --bind 0.0.0.0:8000
+exec gunicorn clothing_crm.wsgi:application --bind 0.0.0.0:8000

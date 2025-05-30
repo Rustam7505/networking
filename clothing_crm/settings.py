@@ -69,7 +69,7 @@ DATABASES = {
         'NAME': 'db_aws',     # e.g. 'mydb'
         'USER': 'admin_user',          # e.g. 'postgres'
         'PASSWORD': '1234',      # e.g. 'mypassword'
-        'HOST': 'localhost',              # or your DB host
+        'HOST': 'host.docker.internal',              # or your DB host
         'PORT': '5432',                   # default PostgreSQL port
     }
 }

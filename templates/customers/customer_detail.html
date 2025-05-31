@@ -1,28 +1,275 @@
-{# customers/templates/customers/customer_detail.html #}
 {% extends 'core/base.html' %}
 
-{% block title %}
-    {{ customer.name }} — Customer Detail
-{% endblock %}
+{% block title %}{{ customer.name }} - Customer Detail{% endblock %}
 
 {% block breadcrumb %}
     <span>&gt;</span> <a href="{% url 'customers:customer_list' %}">Customers</a>
     <span>&gt;</span> {{ customer.name }}
 {% endblock %}
 
+{% block extra_css %}
+<style>
+    .customer-detail-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .customer-detail-card {
+        background: var(--white);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        position: relative;
+    }
+
+    .customer-detail-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--primary-green-light));
+    }
+
+    .customer-header {
+        padding: 2rem;
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .customer-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--primary-green);
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 700;
+        box-shadow: var(--shadow);
+    }
+
+    .customer-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .customer-basic-info h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0 0 0.5rem;
+    }
+
+    .customer-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    .customer-status.active {
+        background: var(--light-green);
+        color: var(--secondary-green);
+    }
+
+    .customer-status.inactive {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .customer-info-grid {
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .info-section {
+        background: var(--gray-50);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        border: 1px solid var(--gray-200);
+    }
+
+    .info-section h4 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0 0 1rem;
+        padding-left: 0.75rem;
+        border-left: 3px solid var(--primary-green);
+    }
+
+    .info-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 500;
+        color: var(--text-light);
+        font-size: 0.875rem;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: var(--text-dark);
+        text-align: right;
+    }
+
+    /* Button styles */
+    .btn-warning {
+        background: #f59e0b;
+        color: white;
+    }
+
+    .btn-warning:hover {
+        background: #d97706;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .customer-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .customer-info-grid {
+            grid-template-columns: 1fr;
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="card">
-    <h2>{{ customer.name }}</h2>
+<div class="customer-detail-container">
+    <div class="page-header">
+        <h2>Customer Details</h2>
+        <div class="header-actions">
+            <a href="{% url 'customers:customer_update' customer.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'customers:customer_delete' customer.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+    </div>
 
-    <ul class="list-unstyled">
-        <li><strong>Email:</strong> {{ customer.email }}</li>
-        <li><strong>Telefon:</strong> {{ customer.phone }}</li>
-        <li><strong>Address:</strong> {{ customer.address }}</li>
-        <li><strong>Status:</strong> {{ customer.get_status_display }}</li>
-        <!-- modelda qaysi maydonlar bo‘lsa, shu yerda ko‘rsating -->
-    </ul>
+    <div class="customer-detail-card">
+        <div class="customer-header">
+            <div class="customer-avatar">
+                {% if customer.profile_image %}
+                    <img src="{{ customer.profile_image.url }}" alt="{{ customer.name }}">
+                {% else %}
+                    {{ customer.name|make_list|first|upper }}
+                {% endif %}
+            </div>
+            <div class="customer-basic-info">
+                <h3>{{ customer.name }}</h3>
+                <span class="customer-status {{ customer.status|default:'active' }}">
+                    {{ customer.get_status_display|default:'Active' }}
+                </span>
+            </div>
+        </div>
 
-    <a href="{% url 'customers:customer_update' customer.pk %}" class="btn btn-primary">Edit</a>
-    <a href="{% url 'customers:customer_delete' customer.pk %}" class="btn btn-danger">Delete</a>
+        <div class="customer-info-grid">
+            <div class="info-section">
+                <h4>Contact Information</h4>
+                <ul class="info-list">
+                    <li class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">{{ customer.email|default:"-" }}</span>
+                    </li>
+                    <li class="info-item">
+                        <span class="info-label">Phone:</span>
+                        <span class="info-value">{{ customer.phone|default:"-" }}</span>
+                    </li>
+                    <li class="info-item">
+                        <span class="info-label">Address:</span>
+                        <span class="info-value">{{ customer.address|default:"-" }}</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="info-section">
+                <h4>Account Information</h4>
+                <ul class="info-list">
+                    <li class="info-item">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value">{{ customer.get_status_display|default:'Active' }}</span>
+                    </li>
+                    <li class="info-item">
+                        <span class="info-label">Created:</span>
+                        <span class="info-value">{{ customer.created_at|date:"F j, Y" }}</span>
+                    </li>
+                    <li class="info-item">
+                        <span class="info-label">Last Updated:</span>
+                        <span class="info-value">{{ customer.updated_at|date:"F j, Y" }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

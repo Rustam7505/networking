@@ -1,38 +1,22 @@
-# Django uchun Dockerfile
+# Python bazaviy imij
 FROM python:3.11-slim
-LABEL authors=""
 
-# Ishchi papkani o'rnatish
+# Ishchi katalogni o'rnatamiz
 WORKDIR /app
 
-# System-level dependencies (e.g., psycopg2 needs build tools)
-RUN apt-get update \
-    && apt-get install -y build-essential libpq-dev gcc \
-    && apt-get clean
+# Talablar faylini nusxalash va o'rnatish
+COPY requirements.txt .
 
-# Fayllarni nusxalash
-COPY . /app
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Virtual environment (optional but recommended)
-# RUN python -m venv venv
-# RUN . venv/bin/activate
+# Django loyihani konteynerga ko'chirish
+COPY . .
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+# Django statik fayllarni tayyorlash (majburiy emas, ammo foydali)
+RUN python manage.py collectstatic --noinput || true
 
-
-# Kerakli kutubxonalarni o'rnatish
-RUN pip install --upgrade pip && pip install -r requirements.txt
-
-# COPY .env is not needed; use env_file: in docker-compose instead
-# COPY .env /app/.env
-
-# Statik fayllarni tayyorlash (prod uchun)
-# RUN python manage.py collectstatic --noinput
-
-# Port ochish
+# Port ochish (agar kerak bo'lsa)
 EXPOSE 8000
 
 # Django serverni ishga tushirish
-CMD ["gunicorn", "NewAssigment.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -1,63 +1,339 @@
 {% extends 'core/base.html' %}
-{% block title %}{% if is_create %}Add order{% else %}Edit order{% endif %}{% endblock %}
+
+{% block title %}{% if is_create %}Add Order{% else %}Edit Order{% endif %} - Kiyim-Kechak CRM{% endblock %}
+
+{% block breadcrumb %}
+    <span>&gt;</span> <a href="{% url 'orders:list' %}">Orders</a>
+    <span>&gt;</span> {% if is_create %}Add Order{% else %}Edit Order{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .form-card {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--primary-green-light));
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .form-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .form-section h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0 0 1rem;
+        padding-left: 0.75rem;
+        border-left: 3px solid var(--primary-green);
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group.has-error label {
+        color: #ef4444;
+    }
+
+    .form-group.has-error input,
+    .form-group.has-error select,
+    .form-group.has-error textarea {
+        border-color: #ef4444;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-dark);
+        font-size: 0.875rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        color: var(--text-dark);
+        background-color: var(--white);
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .form-group select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+        padding-right: 2.5rem;
+    }
+
+    .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .error {
+        color: #ef4444;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+
+    .text-danger {
+        color: #ef4444;
+    }
+
+    /* Items Table */
+    .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        border: 1px solid var(--gray-200);
+        margin-bottom: 1rem;
+    }
+
+    .items-table thead {
+        background: var(--gray-100);
+    }
+
+    .items-table th {
+        padding: 0.75rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--text-dark);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .items-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--gray-200);
+        vertical-align: middle;
+    }
+
+    .items-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .items-table input,
+    .items-table select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+    }
+
+    .items-table input:focus,
+    .items-table select:focus {
+        outline: none;
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+    }
+
+    .delete-checkbox {
+        width: auto !important;
+        margin: 0;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .alert-danger {
+        background: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-card {
+            padding: 1.5rem;
+        }
+
+        .items-table {
+            font-size: 0.875rem;
+        }
+
+        .items-table th,
+        .items-table td {
+            padding: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h2>{% if is_create %}Add order{% else %}Edit order #{{ form.instance.id }}{% endif %}</h2>
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-
-    {{ formset.management_form }}   {# ← majburiy! #}
-
-    {# formset elementlari jadvali #}
-    ...
-
-
-  {# ---- FORMA XATOLARI ---- #}
-  {% if form.non_field_errors %}
-    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-  {% endif %}
-
-  {% for field in form %}
-    <div class="mb-3">
-      {{ field.label_tag }} {{ field }}
-      {% if field.errors %}
-          <div class="text-danger small">{{ field.errors|striptags }}</div>
-      {% endif %}
+<div class="form-container">
+    <div class="page-header">
+        <h2>{% if is_create %}Add Order{% else %}Edit Order #{{ form.instance.id }}{% endif %}</h2>
     </div>
-  {% endfor %}
 
-  <h4 class="mt-4">Items</h4>
-  {{ formset.management_form }}
+    <form method="post">
+        {% csrf_token %}
 
-  <table class="table">
-    <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>DELETE</th></tr></thead>
-    <tbody>
-      {% for f in formset %}
-        <tr>
-          <td>{{ f.product }} {% if f.product.errors %}<span class="text-danger small">{{ f.product.errors|striptags }}</span>{% endif %}</td>
-          <td>{{ f.quantity }} {% if f.quantity.errors %}<span class="text-danger small">{{ f.quantity.errors|striptags }}</span>{% endif %}</td>
-          <td>{{ f.price }} {% if f.price.errors %}<span class="text-danger small">{{ f.price.errors|striptags }}</span>{% endif %}</td>
-          <td>{{ f.DELETE }}</td>
-        </tr>
-        {% if f.non_field_errors %}
-          <tr><td colspan="4" class="text-danger small">{{ f.non_field_errors }}</td></tr>
-        {% endif %}
-      {% endfor %}
-    </tbody>
-  </table>
+        <div class="form-card">
+            <div class="form-section">
+                <h3>Order Information</h3>
 
-  {% if formset.non_form_errors %}
-    <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
-  {% endif %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
 
-  <button class="btn btn-primary" type="submit">
-      {% if is_create %}Save{% else %}Update{% endif %}
-  </button>
-  <a class="btn btn-secondary" href="{% url 'orders:list' %}">Cancel</a>
-</form>
+                <div class="form-grid">
+                    {% for field in form %}
+                        <div class="form-group{% if field.errors %} has-error{% endif %}{% if field.name == 'notes' %} full-width{% endif %}">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="error">{{ field.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Order Items</h3>
+
+                {{ formset.management_form }}
+
+                {% if formset.non_form_errors %}
+                    <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+                {% endif %}
+
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in formset %}
+                            <tr>
+                                <td>
+                                    {{ f.product }}
+                                    {% if f.product.errors %}
+                                        <div class="error">{{ f.product.errors|striptags }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ f.quantity }}
+                                    {% if f.quantity.errors %}
+                                        <div class="error">{{ f.quantity.errors|striptags }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ f.price }}
+                                    {% if f.price.errors %}
+                                        <div class="error">{{ f.price.errors|striptags }}</div>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">
+                                    {{ f.DELETE }}
+                                </td>
+                            </tr>
+                            {% if f.non_field_errors %}
+                                <tr>
+                                    <td colspan="4" class="error">{{ f.non_field_errors }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    {% if is_create %}Save Order{% else %}Update Order{% endif %}
+                </button>
+                <a href="{% url 'orders:list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
 {% endblock %}
-{% if formset.non_form_errors %}
-  <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
-{% endif %}

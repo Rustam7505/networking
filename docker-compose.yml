@@ -1,33 +1,12 @@
-# docker-compose.yml
-version: "3.9"
+version: '3.8'
+
 services:
   web:
     build: .
+    container_name: django_app
+    volumes:
+      - .:/app
     ports:
       - "8000:8000"
-    # env_file: # You said you removed this, so let's keep it removed
-    #   - .env
-    command: gunicorn NewAssigment.wsgi:application --bind 0.0.0.0:8000
-    restart: always
-    volumes:
-      - static_volume:/app/staticfiles
-
-    extra_hosts: # Not strictly needed for inter-container communication, but can stay if you use it for something else
-       - "host.docker.internal:host-gateway"
-    depends_on: # <--- CRUCIAL: Ensures 'db' starts before 'web'
-      - db
-
-  db: # <--- NEW SERVICE: Your PostgreSQL database
-    image: postgres:16 # Use a stable PostgreSQL version (e.g., 13, 14, 15, 16)
     environment:
-      POSTGRES_DB: db_aws # <-- IMPORTANT: Replace with your desired database name
-      POSTGRES_USER: admin_user # <-- IMPORTANT: Replace with your desired username
-      POSTGRES_PASSWORD: 1234 # <-- IMPORTANT: Replace with a strong password
-    volumes:
-      - pgdata:/var/lib/postgresql/data # Persist database data to avoid losing it
-    # ports: # Optional: Only map if you need to access PostgreSQL from your host machine (e.g., via pgAdmin)
-    #   - "5432:5432"
-
-volumes:
-  static_volume:
-  pgdata: # Define the named volume for PostgreSQL data persistence
+      - PYTHONUNBUFFERED=1

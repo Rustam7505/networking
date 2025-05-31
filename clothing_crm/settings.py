@@ -65,12 +65,8 @@ WSGI_APPLICATION = 'clothing_crm.wsgi.application'
 # Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'db_aws',     # e.g. 'mydb'
-        'USER': 'admin_user',          # e.g. 'postgres'
-        'PASSWORD': '1234',      # e.g. 'mypassword'
-        'HOST': 'host.docker.internal',              # or your DB host
-        'PORT': '5432',                   # default PostgreSQL port
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 

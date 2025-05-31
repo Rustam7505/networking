@@ -1,11 +1,8 @@
-<!--{# templates/core/breadcrumb.html #}-->
 {% if here %}
-<nav aria-label="breadcrumb" class="mb-3">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item">
-      <a href="{% url 'dashboard:index' %}">Home</a>
-    </li>
-    <li class="breadcrumb-item active" aria-current="page">{{ here }}</li>
-  </ol>
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-light); font-size: 0.875rem;">
+        <i class="fas fa-chevron-right" style="color: var(--primary-green); font-size: 0.75rem;"></i>
+        <span style="color: var(--primary-green); font-weight: 600;">{{ here|upper }}</span>
+    </div>
 </nav>
 {% endif %}

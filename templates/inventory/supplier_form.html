@@ -1,13 +1,149 @@
 {% extends 'core/base.html' %}
-{% block title %}{{ object|default:'New item' }}{% endblock %}
-{% block content %}
+
+{% block title %}{{ object|default:'Add Supplier' }} - Kiyim-Kechak CRM{% endblock %}
+
+{% block breadcrumb %}
+    {% include 'core/breadcrumb.html' with here=object|default:'Add Supplier' %}
+{% endblock %}
+
 {% load inventory_extras %}
 
-  <h2>{{ object|default:'Add item' }}</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn btn-primary">Save</button>
-    <a href="{{ cancel_url }}" class="btn btn-secondary">Cancel</a>
-  </form>
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .form-card {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--primary-green-light));
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-dark);
+        font-size: 0.875rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        color: var(--text-dark);
+        background-color: var(--white);
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #4b5563;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="page-header">
+        <h2>{{ object|default:'Add Supplier' }}</h2>
+    </div>
+
+    <div class="form-card">
+        <form method="post">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small style="color: var(--text-light); font-size: 0.75rem;">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div style="color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem;">
+                            {{ field.errors|striptags }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <a href="{{ cancel_url|default:'/inventory/suppliers/' }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

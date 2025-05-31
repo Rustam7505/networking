@@ -1,107 +1,514 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard - Kiyim-Kechak CRM{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .dashboard-header {
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-header p {
+        color: var(--text-light);
+        font-size: 1rem;
+    }
+
+    /* Stats Cards Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--primary-green-light));
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .stat-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-card-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: var(--white);
+    }
+
+    .stat-card-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+
+    .stat-card-description {
+        color: var(--text-light);
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card-chart {
+        height: 60px;
+        position: relative;
+    }
+
+    .stat-card-trend {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        margin-top: 1rem;
+    }
+
+    .trend-positive {
+        color: var(--primary-green);
+    }
+
+    .trend-negative {
+        color: #ef4444;
+    }
+
+    /* Progress Bars */
+    .progress-container {
+        background: var(--gray-100);
+        border-radius: 0.5rem;
+        height: 8px;
+        margin: 0.75rem 0;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        border-radius: 0.5rem;
+        transition: width 0.8s ease;
+        background: linear-gradient(90deg, var(--primary-green), var(--primary-green-light));
+    }
+
+    /* Charts Section */
+    .charts-section {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-card {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .chart-card h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .chart-container {
+        height: 300px;
+        position: relative;
+    }
+
+    /* Category Sales Chart */
+    .category-chart {
+        height: 300px;
+    }
+
+    .bar-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        gap: 1rem;
+    }
+
+    .bar-label {
+        min-width: 100px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    .bar-container {
+        flex: 1;
+        background: var(--gray-100);
+        border-radius: 0.5rem;
+        height: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bar {
+        height: 100%;
+        border-radius: 0.5rem;
+        transition: width 0.8s ease;
+        position: relative;
+    }
+
+    .bar-value {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--white);
+    }
+
+    /* Activities Section */
+    .activities-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .activity-card {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .activity-card h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .activity-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .activity-title {
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.875rem;
+    }
+
+    .activity-date {
+        font-size: 0.75rem;
+        color: var(--text-light);
+    }
+
+    .activity-item p {
+        color: var(--text-light);
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    .status-badge.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-badge.completed {
+        background: var(--light-green);
+        color: var(--secondary-green);
+    }
+
+    .status-badge.processing {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-badge.active {
+        background: var(--light-green);
+        color: var(--secondary-green);
+    }
+
+    /* Metrics Cards */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .metric-card {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        text-align: center;
+        position: relative;
+    }
+
+    .metric-chart {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1rem;
+        position: relative;
+    }
+
+    .metric-value {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .metric-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .charts-section {
+            grid-template-columns: 1fr;
+        }
+
+        .activities-section {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .activities-section {
+            grid-template-columns: 1fr;
+        }
+
+        .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stat-card-value {
+            font-size: 2rem;
+        }
+    }
+
+    /* Animation */
+    .stat-card, .chart-card, .activity-card, .metric-card {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="dashboard-grid">
-    <!-- Stats Cards Row -->
-    <div class="stats-row">
+<div class="dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <h1>Dashboard Overview</h1>
+        <p>Welcome back! Here's what's happening with your business today.</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-chart">
+            <div class="stat-card-header">
+                <div class="stat-card-title">Today's Sales</div>
+                <div class="stat-card-icon" style="background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+            </div>
+            <div class="stat-card-value">${{ today_sales|floatformat:0 }}</div>
+            <div class="stat-card-description">Daily revenue from all sales channels</div>
+            <div class="stat-card-chart">
                 <canvas id="salesChart1"></canvas>
-                <div class="stat-value">${{ today_sales|floatformat:0 }}</div>
             </div>
-            <div class="stat-info">
-                <h3>TODAY'S SALES</h3>
-                <p>Daily revenue from all sales channels.</p>
+            <div class="stat-card-trend trend-positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>+12% from yesterday</span>
             </div>
         </div>
-        
+
         <div class="stat-card">
-            <div class="stat-chart">
+            <div class="stat-card-header">
+                <div class="stat-card-title">Weekly Sales</div>
+                <div class="stat-card-icon" style="background: linear-gradient(135deg, #3b82f6, #60a5fa);">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+            </div>
+            <div class="stat-card-value">${{ weekly_sales|floatformat:0 }}</div>
+            <div class="stat-card-description">Revenue for the current week</div>
+            <div class="stat-card-chart">
                 <canvas id="salesChart2"></canvas>
-                <div class="stat-value">${{ weekly_sales|floatformat:0 }}</div>
             </div>
-            <div class="stat-info">
-                <h3>WEEKLY SALES</h3>
-                <p>Revenue for the current week.</p>
+            <div class="stat-card-trend trend-positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>+8% from last week</span>
             </div>
         </div>
-        
+
         <div class="stat-card">
-            <div class="stat-chart">
+            <div class="stat-card-header">
+                <div class="stat-card-title">Monthly Sales</div>
+                <div class="stat-card-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+            </div>
+            <div class="stat-card-value">${{ monthly_sales|floatformat:0 }}</div>
+            <div class="stat-card-description">Revenue for the current month</div>
+            <div class="stat-card-chart">
                 <canvas id="salesChart3"></canvas>
-                <div class="stat-value">${{ monthly_sales|floatformat:0 }}</div>
             </div>
-            <div class="stat-info">
-                <h3>MONTHLY SALES</h3>
-                <p>Revenue for the current month.</p>
-            </div>
-        </div>
-        
-        <div class="stat-card wide">
-            <div class="stat-info">
-                <h3>SALES OVERVIEW</h3>
-                <div class="percentage">{{ total_orders }}</div>
-                <p>Total number of orders in the system.</p>
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: 64%; background-color: #00ffff;"></div>
-                </div>
-                <p>{{ active_orders }} active orders currently being processed.</p>
+            <div class="stat-card-trend trend-positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>+15% from last month</span>
             </div>
         </div>
-        
-        <div class="stat-card wide">
-            <div class="stat-info">
-                <h3>INVENTORY STATUS</h3>
-                <p>Total Products: {{ total_products }}</p>
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: 75%; background-color: #ff6b6b;"></div>
+
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-card-title">Total Orders</div>
+                <div class="stat-card-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
+                    <i class="fas fa-shopping-cart"></i>
                 </div>
-                <p>Low Stock Items: {{ low_stock_products }}</p>
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: 45%; background-color: #ff9f43;"></div>
-                </div>
-                <p>Total Customers: {{ total_customers }}</p>
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: 90%; background-color: #00d2d3;"></div>
-                </div>
+            </div>
+            <div class="stat-card-value">{{ total_orders }}</div>
+            <div class="stat-card-description">Total number of orders in the system</div>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: 64%;"></div>
+            </div>
+            <div class="stat-card-trend trend-positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>{{ active_orders }} active orders</span>
             </div>
         </div>
     </div>
-    
-    <!-- Charts Row -->
-    <div class="charts-row">
+
+    <!-- Charts Section -->
+    <div class="charts-section">
         <div class="chart-card">
-            <canvas id="lineChart"></canvas>
-        </div>
-        
-        <div class="chart-card">
+            <h3>Sales Trend</h3>
             <div class="chart-container">
-                <div class="bar-chart">
-                    {% for category in sales_by_category|slice:":5" %}
-                    <div class="bar-item">
-                        <div class="bar-label">{{ category.product__category__name }}</div>
-                        <div class="bar-container">
-                            <div class="bar" style="width: {{ category.total_revenue|floatformat:0 }}%; background-color: 
-                                {% cycle '#ff6b6b' '#48dbfb' '#1dd1a1' '#feca57' '#ff9ff3' %};">
-                            </div>
+                <canvas id="lineChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Sales by Category</h3>
+            <div class="category-chart">
+                {% for category in sales_by_category|slice:":5" %}
+                <div class="bar-item">
+                    <div class="bar-label">{{ category.product__category__name|truncatechars:12 }}</div>
+                    <div class="bar-container">
+                        <div class="bar" style="width: {{ category.percentage|default:0 }}%; background: linear-gradient(90deg,
+                            {% cycle 'var(--primary-green)' '#3b82f6' '#8b5cf6' '#f59e0b' '#ef4444' %},
+                            {% cycle 'var(--primary-green-light)' '#60a5fa' '#a78bfa' '#fbbf24' '#f87171' %});">
+                            <div class="bar-value">${{ category.total_revenue|floatformat:0 }}</div>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
-            <div class="chart-info">
-                <h3>SALES BY CATEGORY</h3>
-                <p>Distribution of sales across different product categories.</p>
+                {% empty %}
+                <div class="bar-item">
+                    <p style="text-align: center; color: var(--text-light);">No category data available</p>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
-    
-    <!-- Recent Orders and Customers -->
-    <div class="activities-row">
-        <div class="activities-card">
-            <h3>RECENT ORDERS</h3>
+
+    <!-- Activities Section -->
+    <div class="activities-section">
+        <div class="activity-card">
+            <h3>Recent Orders</h3>
             <div class="activities-list">
                 {% for order in recent_orders %}
                 <div class="activity-item">
@@ -114,14 +521,14 @@
                 </div>
                 {% empty %}
                 <div class="activity-item">
-                    <p>No recent orders found.</p>
+                    <p style="text-align: center; color: var(--text-light);">No recent orders found</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
-        
-        <div class="activities-card">
-            <h3>RECENT CUSTOMERS</h3>
+
+        <div class="activity-card">
+            <h3>Recent Customers</h3>
             <div class="activities-list">
                 {% for customer in recent_customers %}
                 <div class="activity-item">
@@ -130,71 +537,109 @@
                         <span class="activity-date">{{ customer.created_at|date:"M d, Y" }}</span>
                     </div>
                     <p>{{ customer.email|default:"No email provided" }}</p>
-                    <span class="status-badge {{ customer.status }}">{{ customer.get_status_display }}</span>
+                    <span class="status-badge {{ customer.status|default:'active' }}">{{ customer.get_status_display|default:'Active' }}</span>
                 </div>
                 {% empty %}
                 <div class="activity-item">
-                    <p>No recent customers found.</p>
+                    <p style="text-align: center; color: var(--text-light);">No recent customers found</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
-        
-        <div class="metrics-card">
-            <div class="metrics-container">
-                <div class="metric-item">
-                    <div class="metric-chart">
-                        <canvas id="doughnutChart1"></canvas>
-                        <div class="metric-value">{{ active_orders }}</div>
-                    </div>
-                    <div class="metric-label">Active Orders</div>
+
+        <div class="activity-card">
+            <h3>Inventory Status</h3>
+            <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.875rem; color: var(--text-light);">Total Products</span>
+                    <span style="font-weight: 600; color: var(--text-dark);">{{ total_products }}</span>
                 </div>
-                <div class="metric-item">
-                    <div class="metric-chart">
-                        <canvas id="doughnutChart2"></canvas>
-                        <div class="metric-value">{{ total_customers }}</div>
-                    </div>
-                    <div class="metric-label">Customers</div>
-                </div>
-                <div class="metric-item">
-                    <div class="metric-chart">
-                        <canvas id="doughnutChart3"></canvas>
-                        <div class="metric-value">{{ total_products }}</div>
-                    </div>
-                    <div class="metric-label">Products</div>
-                </div>
-                <div class="metric-item">
-                    <div class="metric-chart">
-                        <canvas id="doughnutChart4"></canvas>
-                        <div class="metric-value">${{ total_sales|floatformat:0 }}</div>
-                    </div>
-                    <div class="metric-label">Total Sales</div>
-                </div>
-                <div class="metric-item">
-                    <div class="metric-chart">
-                        <canvas id="doughnutChart5"></canvas>
-                        <div class="metric-value">{{ low_stock_products }}</div>
-                    </div>
-                    <div class="metric-label">Low Stock</div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 75%;"></div>
                 </div>
             </div>
-            <div class="metrics-slider">
-                <input type="range" min="0" max="100" value="50" class="slider">
-                <div class="slider-labels">
-                    <span>Today</span>
-                    <span>Week</span>
-                    <span>Month</span>
-                    <span>Quarter</span>
-                    <span>Year</span>
+
+            <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.875rem; color: var(--text-light);">Low Stock Items</span>
+                    <span style="font-weight: 600; color: #ef4444;">{{ low_stock_products }}</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 25%; background: linear-gradient(90deg, #ef4444, #f87171);"></div>
                 </div>
             </div>
+
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.875rem; color: var(--text-light);">Total Customers</span>
+                    <span style="font-weight: 600; color: var(--text-dark);">{{ total_customers }}</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 90%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-chart">
+                <canvas id="doughnutChart1"></canvas>
+                <div class="metric-value">{{ active_orders }}</div>
+            </div>
+            <div class="metric-label">Active Orders</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-chart">
+                <canvas id="doughnutChart2"></canvas>
+                <div class="metric-value">{{ total_customers }}</div>
+            </div>
+            <div class="metric-label">Total Customers</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-chart">
+                <canvas id="doughnutChart3"></canvas>
+                <div class="metric-value">{{ total_products }}</div>
+            </div>
+            <div class="metric-label">Products</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-chart">
+                <canvas id="doughnutChart4"></canvas>
+                <div class="metric-value">${{ total_sales|floatformat:0 }}</div>
+            </div>
+            <div class="metric-label">Total Sales</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-chart">
+                <canvas id="doughnutChart5"></canvas>
+                <div class="metric-value">{{ low_stock_products }}</div>
+            </div>
+            <div class="metric-label">Low Stock</div>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Color palette
+    const colors = {
+        primary: '#10b981',
+        primaryLight: '#34d399',
+        secondary: '#3b82f6',
+        purple: '#8b5cf6',
+        orange: '#f59e0b',
+        red: '#ef4444',
+        gray: '#6b7280'
+    };
+
     // Circular progress charts
     function createDoughnutChart(canvasId, percentage, color) {
         const ctx = document.getElementById(canvasId).getContext('2d');
@@ -203,7 +648,7 @@
             data: {
                 datasets: [{
                     data: [percentage, 100 - percentage],
-                    backgroundColor: [color, '#2a2a4a'],
+                    backgroundColor: [color, '#f3f4f6'],
                     borderWidth: 0
                 }]
             },
@@ -212,17 +657,13 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        enabled: false
-                    }
+                    legend: { display: false },
+                    tooltip: { enabled: false }
                 }
             }
         });
     }
-    
+
     // Line chart
     function createLineChart() {
         const ctx = document.getElementById('lineChart').getContext('2d');
@@ -230,56 +671,67 @@
             type: 'line',
             data: {
                 labels: {{ months|safe }},
-                datasets: [
-                    {
-                        label: 'Monthly Sales',
-                        data: {{ monthly_data|safe }},
-                        borderColor: '#ff6b6b',
-                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }
-                ]
+                datasets: [{
+                    label: 'Monthly Sales',
+                    data: {{ monthly_data|safe }},
+                    borderColor: colors.primary,
+                    backgroundColor: colors.primary + '20',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: colors.primary,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
                 scales: {
                     y: {
                         beginAtZero: true,
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            color: '#f3f4f6',
+                            drawBorder: false
                         },
                         ticks: {
-                            color: '#aaa'
+                            color: '#6b7280',
+                            font: { size: 12 }
                         }
                     },
                     x: {
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            display: false
                         },
                         ticks: {
-                            color: '#aaa'
+                            color: '#6b7280',
+                            font: { size: 12 }
                         }
                     }
                 },
                 plugins: {
                     legend: {
-                        display: true,
-                        labels: {
-                            color: '#aaa'
-                        }
+                        display: false
                     },
-                    title: {
-                        display: true,
-                        text: 'Monthly Sales Trend',
-                        color: '#fff'
+                    tooltip: {
+                        backgroundColor: '#1f2937',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: colors.primary,
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: false
                     }
                 }
             }
         });
     }
-    
+
     // Semi-circular charts
     function createSemiCircleChart(canvasId, percentage, color) {
         const ctx = document.getElementById(canvasId).getContext('2d');
@@ -288,7 +740,7 @@
             data: {
                 datasets: [{
                     data: [percentage, 100 - percentage],
-                    backgroundColor: [color, 'rgba(255, 255, 255, 0.1)'],
+                    backgroundColor: [color, '#f3f4f6'],
                     borderWidth: 0
                 }]
             },
@@ -299,33 +751,40 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        enabled: false
-                    }
+                    legend: { display: false },
+                    tooltip: { enabled: false }
                 }
             }
         });
     }
-    
+
     // Initialize all charts when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
-        // Create doughnut charts
-        createDoughnutChart('doughnutChart1', 40, '#ff6b6b');
-        createDoughnutChart('doughnutChart2', 75, '#48dbfb');
-        createDoughnutChart('doughnutChart3', 20, '#1dd1a1');
-        createDoughnutChart('doughnutChart4', 80, '#feca57');
-        createDoughnutChart('doughnutChart5', 60, '#ff9ff3');
-        
+        // Create doughnut charts with green theme
+        createDoughnutChart('doughnutChart1', 65, colors.primary);
+        createDoughnutChart('doughnutChart2', 80, colors.secondary);
+        createDoughnutChart('doughnutChart3', 45, colors.purple);
+        createDoughnutChart('doughnutChart4', 90, colors.orange);
+        createDoughnutChart('doughnutChart5', 30, colors.red);
+
         // Create semi-circle charts
-        createSemiCircleChart('salesChart1', 70, '#00d2d3');
-        createSemiCircleChart('salesChart2', 85, '#ff9f43');
-        createSemiCircleChart('salesChart3', 60, '#ee5253');
-        
+        createSemiCircleChart('salesChart1', 70, colors.primary);
+        createSemiCircleChart('salesChart2', 85, colors.secondary);
+        createSemiCircleChart('salesChart3', 60, colors.purple);
+
         // Create line chart
         createLineChart();
+
+        // Animate progress bars
+        setTimeout(() => {
+            document.querySelectorAll('.progress-bar').forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        }, 500);
     });
 </script>
 {% endblock %}

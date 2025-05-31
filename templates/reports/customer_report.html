@@ -1,33 +1,246 @@
 {% extends 'core/base.html' %}
-{% block title %}Customer report{% endblock %}
-{% block breadcrumb %}{% include 'core/breadcrumb.html' with here='Customer report' %}{% endblock %}
+
+{% block title %}Customer Report - Kiyim-Kechak CRM{% endblock %}
+
+{% block breadcrumb %}
+    {% include 'core/breadcrumb.html' with here='Customer Report' %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .table-card {
+        background: var(--white);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        position: relative;
+    }
+
+    .table-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #7c3aed, #a78bfa);
+    }
+
+    .table-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--gray-200);
+        background: var(--gray-50);
+    }
+
+    .table-header h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .custom-table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .custom-table thead th {
+        background: var(--gray-50);
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 1rem 1.5rem;
+        border: none;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .custom-table tbody td {
+        padding: 1rem 1.5rem;
+        border: none;
+        border-bottom: 1px solid var(--gray-100);
+        color: var(--text-dark);
+        font-size: 0.875rem;
+    }
+
+    .custom-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    .custom-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .customer-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #7c3aed;
+        color: var(--white);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-right: 0.75rem;
+    }
+
+    .customer-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .customer-name {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .order-count {
+        background: var(--light-green);
+        color: var(--primary-green);
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .total-spent {
+        font-weight: 600;
+        color: var(--primary-green);
+    }
+
+    .export-btn {
+        background: var(--white);
+        border: 1px solid var(--gray-300);
+        color: var(--text-dark);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .export-btn:hover {
+        background: var(--gray-50);
+        border-color: #7c3aed;
+        color: #7c3aed;
+        text-decoration: none;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-light);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--gray-300);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .customer-info {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .customer-avatar {
+            margin-right: 0;
+        }
+
+        .custom-table {
+            font-size: 0.75rem;
+        }
+
+        .custom-table thead th,
+        .custom-table tbody td {
+            padding: 0.75rem 1rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h2 class="mb-3">Customer report</h2>
+<div class="page-header">
+    <h2>Customer Analytics</h2>
+    <a href="#" class="export-btn">
+        <i class="fas fa-download"></i>
+        Export Data
+    </a>
+</div>
 
-<div class="table-responsive">
-  <table class="table table-striped align-middle">
-    <thead class="table-light small">
-      <tr>
-        <th>#</th><th>Customer</th>
-        <th class="text-end">Orders</th>
-        <th class="text-end">Total spent</th>
-        <th>Last order</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for c in customers %}
-      <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ c.name }}</td>
-        <td class="text-end">{{ c.order_count }}</td>
-        <td class="text-end">{{ c.total_spent|floatformat:2 }}</td>
-        <td>{{ c.last_order|date:"Y-m-d" }}</td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="5" class="text-center py-4 text-muted">No data.</td></tr>
-    {% endfor %}
-    </tbody>
-  </table>
+<!-- Table Card -->
+<div class="table-card">
+    <div class="table-header">
+        <h3>Customer Performance</h3>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer</th>
+                    <th class="text-end">Orders</th>
+                    <th class="text-end">Total Spent</th>
+                    <th>Last Order</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in customers %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <div class="customer-info">
+                            <div class="customer-avatar">
+                                {{ c.name|first|upper }}
+                            </div>
+                            <div class="customer-name">{{ c.name }}</div>
+                        </div>
+                    </td>
+                    <td class="text-end">
+                        <span class="order-count">{{ c.order_count }}</span>
+                    </td>
+                    <td class="text-end">
+                        <span class="total-spent">${{ c.total_spent|floatformat:2 }}</span>
+                    </td>
+                    <td>{{ c.last_order|date:"M d, Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <div>No customer data available</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

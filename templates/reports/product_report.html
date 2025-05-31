@@ -1,33 +1,239 @@
 {% extends 'core/base.html' %}
-{% block title %}Product report{% endblock %}
-{% block breadcrumb %}{% include 'core/breadcrumb.html' with here='Product report' %}{% endblock %}
+
+{% block title %}Product Report - Kiyim-Kechak CRM{% endblock %}
+
+{% block breadcrumb %}
+    {% include 'core/breadcrumb.html' with here='Product Report' %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .table-card {
+        background: var(--white);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        position: relative;
+    }
+
+    .table-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #dc2626, #f87171);
+    }
+
+    .table-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--gray-200);
+        background: var(--gray-50);
+    }
+
+    .table-header h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .custom-table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .custom-table thead th {
+        background: var(--gray-50);
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 1rem 1.5rem;
+        border: none;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .custom-table tbody td {
+        padding: 1rem 1.5rem;
+        border: none;
+        border-bottom: 1px solid var(--gray-100);
+        color: var(--text-dark);
+        font-size: 0.875rem;
+    }
+
+    .custom-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    .custom-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .units-sold {
+        background: #fee2e2;
+        color: #dc2626;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .revenue {
+        font-weight: 600;
+        color: var(--primary-green);
+    }
+
+    .stock-level {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .stock-high {
+        background: var(--light-green);
+        color: var(--primary-green);
+    }
+
+    .stock-medium {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .stock-low {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .export-btn {
+        background: var(--white);
+        border: 1px solid var(--gray-300);
+        color: var(--text-dark);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .export-btn:hover {
+        background: var(--gray-50);
+        border-color: #dc2626;
+        color: #dc2626;
+        text-decoration: none;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-light);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--gray-300);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .custom-table {
+            font-size: 0.75rem;
+        }
+
+        .custom-table thead th,
+        .custom-table tbody td {
+            padding: 0.75rem 1rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h2 class="mb-3">Product report</h2>
+<div class="page-header">
+    <h2>Product Performance</h2>
+    <a href="#" class="export-btn">
+        <i class="fas fa-download"></i>
+        Export Data
+    </a>
+</div>
 
-<div class="table-responsive">
-  <table class="table table-striped align-middle">
-    <thead class="table-light small">
-      <tr>
-        <th>#</th><th>Product</th>
-        <th class="text-end">Units&nbsp;sold</th>
-        <th class="text-end">Revenue</th>
-        <th class="text-end">Stock&nbsp;left</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for p in products %}
-      <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ p.name }}</td>
-        <td class="text-end">{{ p.units_sold }}</td>
-        <td class="text-end">{{ p.revenue|floatformat:2 }}</td>
-        <td class="text-end">{{ p.stock }}</td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="5" class="text-center py-4 text-muted">No data.</td></tr>
-    {% endfor %}
-    </tbody>
-  </table>
+<!-- Table Card -->
+<div class="table-card">
+    <div class="table-header">
+        <h3>Product Sales & Inventory</h3>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th class="text-end">Units Sold</th>
+                    <th class="text-end">Revenue</th>
+                    <th class="text-end">Stock Left</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <div class="product-name">{{ p.name }}</div>
+                    </td>
+                    <td class="text-end">
+                        <span class="units-sold">{{ p.units_sold }}</span>
+                    </td>
+                    <td class="text-end">
+                        <span class="revenue">${{ p.revenue|floatformat:2 }}</span>
+                    </td>
+                    <td class="text-end">
+                        <span class="stock-level {% if p.stock > 50 %}stock-high{% elif p.stock > 10 %}stock-medium{% else %}stock-low{% endif %}">
+                            {{ p.stock }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state">
+                        <i class="fas fa-tshirt"></i>
+                        <div>No product data available</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

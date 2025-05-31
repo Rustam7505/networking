@@ -1,55 +1,237 @@
 {% extends 'core/base.html' %}
 {% load static %}
-{% block title %}Reports{% endblock %}
+
+{% block title %}Reports - Kiyim-Kechak CRM{% endblock %}
 
 {% block breadcrumb %}
-  {% include 'core/breadcrumb.html' with here='Reports' %}
+    {% include 'core/breadcrumb.html' with here='Reports' %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .page-subtitle {
+        color: var(--text-light);
+        font-size: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .reports-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .report-card {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .report-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--primary-green-light));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .report-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .report-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .report-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--white);
+    }
+
+    .report-icon.sales {
+        background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+    }
+
+    .report-icon.inventory {
+        background: linear-gradient(135deg, #059669, #34d399);
+    }
+
+    .report-icon.profit {
+        background: linear-gradient(135deg, #d97706, #fbbf24);
+    }
+
+    .report-icon.customer {
+        background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    }
+
+    .report-icon.product {
+        background: linear-gradient(135deg, #dc2626, #f87171);
+    }
+
+    .report-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .report-description {
+        color: var(--text-light);
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--white);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-green);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-light);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .reports-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .quick-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .quick-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2 class="m-0">Reports</h2>
-  <!-- Bu yerga istasangiz «Export» tugmasi yoki filtr qo‘shishingiz mumkin -->
+<div class="page-header">
+    <h2>Reports & Analytics</h2>
+    <p class="page-subtitle">Comprehensive business insights and performance metrics</p>
 </div>
 
-<div class="row g-4">
-  <!-- Sotuv hisobotlari -->
-  <div class="col-md-4">
-    <a href="{% url 'reports:sales' %}" class="text-decoration-none">
-      <div class="card shadow-sm h-100">
-        <div class="card-body text-center">
-          <i class="fas fa-chart-line fa-2x mb-2 text-primary"></i>
-          <h5 class="card-title mb-0">Sales report</h5>
-          <p class="text-muted small mb-0">Orders, revenue, growth …</p>
-        </div>
-      </div>
-    </a>
-  </div>
+<!-- Quick Stats -->
+<div class="quick-stats">
+    <div class="stat-card">
+        <div class="stat-value">{{ total_orders|default:"0" }}</div>
+        <div class="stat-label">Total Orders</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">${{ total_revenue|floatformat:0|default:"0" }}</div>
+        <div class="stat-label">Total Revenue</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_customers|default:"0" }}</div>
+        <div class="stat-label">Active Customers</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_products|default:"0" }}</div>
+        <div class="stat-label">Products</div>
+    </div>
+</div>
 
-  <!-- Inventarizatsiya hisobotlari -->
-  <div class="col-md-4">
-    <a href="{% url 'reports:inventory' %}" class="text-decoration-none">
-      <div class="card shadow-sm h-100">
-        <div class="card-body text-center">
-          <i class="fas fa-warehouse fa-2x mb-2 text-success"></i>
-          <h5 class="card-title mb-0">Inventory report</h5>
-          <p class="text-muted small mb-0">Stock levels, turnover …</p>
+<!-- Reports Grid -->
+<div class="reports-grid">
+    <!-- Sales Report -->
+    <a href="{% url 'reports:sales' %}" class="report-card">
+        <div class="report-icon sales">
+            <i class="fas fa-chart-line"></i>
         </div>
-      </div>
+        <div class="report-title">Sales Report</div>
+        <div class="report-description">
+            Analyze sales performance, revenue trends, and order patterns over time
+        </div>
     </a>
-  </div>
 
-  <!-- Foyda va zarar -->
-  <div class="col-md-4">
-    <a href="{% url 'reports:profit' %}" class="text-decoration-none">
-      <div class="card shadow-sm h-100">
-        <div class="card-body text-center">
-          <i class="fas fa-coins fa-2x mb-2 text-warning"></i>
-          <h5 class="card-title mb-0">Profit & loss</h5>
-          <p class="text-muted small mb-0">Margin, expenses …</p>
+    <!-- Inventory Report -->
+    <a href="{% url 'reports:inventory' %}" class="report-card">
+        <div class="report-icon inventory">
+            <i class="fas fa-warehouse"></i>
         </div>
-      </div>
+        <div class="report-title">Inventory Report</div>
+        <div class="report-description">
+            Track stock levels, inventory turnover, and product movement analytics
+        </div>
     </a>
-  </div>
+
+    <!-- Profit & Loss -->
+    <a href="{% url 'reports:profit' %}" class="report-card">
+        <div class="report-icon profit">
+            <i class="fas fa-coins"></i>
+        </div>
+        <div class="report-title">Profit & Loss</div>
+        <div class="report-description">
+            Monitor profitability, margins, expenses, and financial performance
+        </div>
+    </a>
+
+    <!-- Product Report -->
+    <a href="{% url 'reports:product' %}" class="report-card">
+        <div class="report-icon product">
+            <i class="fas fa-tshirt"></i>
+        </div>
+        <div class="report-title">Product Performance</div>
+        <div class="report-description">
+            Best-selling products, revenue by category, and stock analysis
+        </div>
+    </a>
 </div>
 {% endblock %}

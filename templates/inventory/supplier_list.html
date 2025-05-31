@@ -1,40 +1,221 @@
 {% extends 'core/base.html' %}
-{% block title %}Suppliers{% endblock %}
-{% block breadcrumb %}{% include 'core/breadcrumb.html' with here='Suppliers' %}{% endblock %}
+
+{% block title %}Suppliers - Kiyim-Kechak CRM{% endblock %}
+
+{% block breadcrumb %}
+    {% include 'core/breadcrumb.html' with here='Suppliers' %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .supplier-list-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    /* Table */
+    .table-responsive {
+        background: var(--white);
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table thead {
+        background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+        color: var(--white);
+    }
+
+    .data-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .data-table th.text-end {
+        text-align: right;
+    }
+
+    .data-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--gray-200);
+        vertical-align: middle;
+    }
+
+    .data-table td.text-end {
+        text-align: right;
+    }
+
+    .data-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .supplier-link {
+        color: var(--primary-green);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .supplier-link:hover {
+        color: var(--primary-green-dark);
+        text-decoration: underline;
+    }
+
+    /* Table Actions */
+    .table-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: 0.375rem;
+    }
+
+    .btn-outline-primary {
+        background: transparent;
+        color: var(--primary-green);
+        border: 1px solid var(--primary-green);
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary-green);
+        color: white;
+    }
+
+    .btn-outline-danger {
+        background: transparent;
+        color: #ef4444;
+        border: 1px solid #ef4444;
+    }
+
+    .btn-outline-danger:hover {
+        background: #ef4444;
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--gray-300);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        font-size: 1.125rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            min-width: 600px;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2 class="m-0">Suppliers</h2>
-  <a href="{% url 'inventory:supplier_create' %}" class="btn btn-primary">
-     <i class="fas fa-plus me-1"></i> Add supplier
-  </a>
-</div>
+<div class="supplier-list-container">
+    <div class="page-header">
+        <h2>Suppliers</h2>
+        <a href="{% url 'inventory:supplier_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Supplier
+        </a>
+    </div>
 
-<div class="table-responsive">
-<table class="table table-hover align-middle">
-  <thead class="table-light">
-    <tr><th>#</th><th>Name</th><th>Phone</th><th>Email</th><th class="text-end">Actions</th></tr>
-  </thead>
-  <tbody>
-  {% for s in suppliers %}
-    <tr>
-      <td>{{ forloop.counter }}</td>
-      <td><a href="{% url 'inventory:supplier_detail' s.pk %}">{{ s.name }}</a></td>
-      <td>{{ s.phone|default:"—" }}</td>
-      <td>{{ s.email|default:"—" }}</td>
-      <td class="text-end">
-        <a href="{% url 'inventory:supplier_update' s.pk %}" class="btn btn-sm btn-outline-primary">
-           <i class="fas fa-edit"></i>
-        </a>
-        <a href="{% url 'inventory:supplier_delete' s.pk %}" class="btn btn-sm btn-outline-danger">
-           <i class="fas fa-trash-alt"></i>
-        </a>
-      </td>
-    </tr>
-  {% empty %}
-    <tr><td colspan="5" class="text-center py-4 text-muted">No suppliers.</td></tr>
-  {% endfor %}
-  </tbody>
-</table>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in suppliers %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <a href="{% url 'inventory:supplier_detail' s.pk %}" class="supplier-link">
+                            {{ s.name }}
+                        </a>
+                    </td>
+                    <td>{{ s.phone|default:"—" }}</td>
+                    <td>{{ s.email|default:"—" }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'inventory:supplier_update' s.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'inventory:supplier_delete' s.pk %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <i class="fas fa-truck"></i>
+                            <p>No suppliers found.</p>
+                            <a href="{% url 'inventory:supplier_create' %}" class="btn btn-primary">Add Supplier</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

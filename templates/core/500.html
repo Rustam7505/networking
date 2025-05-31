@@ -1,12 +1,42 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Server Error{% endblock %}
+{% block title %}Server Error - Kiyim-Kechak CRM{% endblock %}
 
 {% block content %}
 <div class="error-page">
     <div class="error-code">500</div>
     <h1>Server Error</h1>
-    <p>Something went wrong on our end. Please try again later.</p>
-    <a href="{% url 'dashboard:index' %}" class="btn btn-primary">Go to Dashboard</a>
+    <p>Something went wrong on our end. Our team has been notified and is working to fix the issue. Please try again in a few moments.</p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">
+        <a href="{% url 'dashboard:index' %}" class="btn btn-primary">
+            <i class="fas fa-home"></i>
+            Go to Dashboard
+        </a>
+        <button onclick="window.location.reload()" class="btn btn-secondary">
+            <i class="fas fa-redo"></i>
+            Try Again
+        </button>
+    </div>
 </div>
+
+<style>
+    .error-page {
+        background: var(--white);
+        border-radius: 1rem;
+        box-shadow: var(--shadow-lg);
+        margin: 2rem auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .error-page::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--primary-green-light));
+    }
+</style>
 {% endblock %}

@@ -2,9 +2,202 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logged Out - Kiyim-Kechak CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #10b981;
+            --primary-green-dark: #059669;
+            --primary-green-light: #34d399;
+            --secondary-green: #065f46;
+            --light-green: #ecfdf5;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .logout-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logout-card {
+            background: var(--white);
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logout-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--primary-green-light));
+        }
+
+        .logout-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--light-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--primary-green);
+            font-size: 2rem;
+        }
+
+        .logout-card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .logout-message {
+            color: var(--text-light);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            gap: 0.5rem;
+            margin: 0 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            color: var(--white);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-green-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--text-dark);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        .logout-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        /* Animation */
+        .logout-card {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .logout-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .logout-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                margin: 0;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="logout-container">
+        <div class="logout-card">
+            <div class="logout-icon">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
 
+            <h2>Successfully Logged Out</h2>
+            <p class="logout-message">
+                You have been successfully logged out of your Kiyim-Kechak CRM account.
+                Thank you for using our system!
+            </p>
+
+            <div class="logout-actions">
+                <a href="{% url 'accounts:login' %}" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In Again
+                </a>
+                <a href="{% url 'dashboard:index' %}" class="btn btn-secondary">
+                    <i class="fas fa-home"></i>
+                    Go to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto redirect after 10 seconds
+        setTimeout(function() {
+            window.location.href = "{% url 'accounts:login' %}";
+        }, 10000);
+    </script>
 </body>
 </html>

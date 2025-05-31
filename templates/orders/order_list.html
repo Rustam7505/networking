@@ -1,95 +1,364 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Orders{% endblock %}
+{% block title %}Orders - Kiyim-Kechak CRM{% endblock %}
 
 {% block breadcrumb %}
-  <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
-  <li class="breadcrumb-item active">Orders</li>
+    <span>&gt;</span> <a href="{% url 'orders:list' %}">Orders</a>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-list-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    /* Filters */
+    .filters {
+        background: var(--white);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .filter-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-group label {
+        font-weight: 500;
+        color: var(--text-dark);
+        font-size: 0.875rem;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        padding: 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 0.5rem;
+        background-color: var(--white);
+        font-size: 0.875rem;
+        color: var(--text-dark);
+        transition: all 0.3s ease;
+    }
+
+    .filter-group select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+        padding-right: 2.5rem;
+    }
+
+    .filter-group input:focus,
+    .filter-group select:focus {
+        outline: none;
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    /* Table */
+    .table-responsive {
+        background: var(--white);
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table thead {
+        background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+        color: var(--white);
+    }
+
+    .data-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .data-table th.text-end {
+        text-align: right;
+    }
+
+    .data-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--gray-200);
+        vertical-align: middle;
+    }
+
+    .data-table td.text-end {
+        text-align: right;
+    }
+
+    .data-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Order ID */
+    .order-id {
+        font-weight: 600;
+        color: var(--primary-green);
+        font-size: 1rem;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    .status-badge.new {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .status-badge.processing {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-badge.shipped {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-badge.completed {
+        background: var(--light-green);
+        color: var(--secondary-green);
+    }
+
+    .status-badge.canceled {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    /* Table Actions */
+    .table-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: 0.375rem;
+    }
+
+    .btn-outline-info {
+        background: transparent;
+        color: #0ea5e9;
+        border: 1px solid #0ea5e9;
+    }
+
+    .btn-outline-info:hover {
+        background: #0ea5e9;
+        color: white;
+    }
+
+    .btn-outline-primary {
+        background: transparent;
+        color: var(--primary-green);
+        border: 1px solid var(--primary-green);
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary-green);
+        color: white;
+    }
+
+    .btn-outline-danger {
+        background: transparent;
+        color: #ef4444;
+        border: 1px solid #ef4444;
+    }
+
+    .btn-outline-danger:hover {
+        background: #ef4444;
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--gray-300);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        font-size: 1.125rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .filter-form {
+            grid-template-columns: 1fr;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            min-width: 700px;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2 class="m-0">Orders</h2>
-  <a class="btn btn-primary" href="{% url 'orders:create' %}">
-      <i class="fas fa-plus me-1"></i> Add order
-  </a>
-</div>
+<div class="order-list-container">
+    <div class="page-header">
+        <h2>Orders</h2>
+        <a href="{% url 'orders:create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Order
+        </a>
+    </div>
 
-<form class="row gy-2 gx-3 align-items-end mb-4" method="get">
-  <div class="col-md-4">
-      <label class="form-label fw-semibold">Search</label>
-      <input type="text" name="search" value="{{ request.GET.search }}"
-             class="form-control" placeholder="Customer name or ID">
-  </div>
-  <div class="col-md-3">
-      <label class="form-label fw-semibold">Status</label>
-      <select name="status" class="form-select">
-          <option value="">All statuses</option>
-          {% for code,label in status_choices %}
-            <option value="{{ code }}"
-                {% if selected_status == code %}selected{% endif %}>
-              {{ label }}
-            </option>
-          {% endfor %}
-      </select>
-  </div>
-  <div class="col-md-auto">
-      <button class="btn btn-outline-secondary">
-         <i class="fas fa-filter me-1"></i> Filter
-      </button>
-  </div>
-</form>
+    <div class="filters">
+        <form method="get" class="filter-form">
+            <div class="filter-group">
+                <label for="search">Search</label>
+                <input type="text" name="search" id="search" value="{{ request.GET.search }}"
+                       placeholder="Customer name or Order ID">
+            </div>
+            <div class="filter-group">
+                <label for="status">Status</label>
+                <select name="status" id="status">
+                    <option value="">All statuses</option>
+                    {% for code, label in status_choices %}
+                        <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <button type="submit" class="btn btn-secondary">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
 
-<div class="table-responsive">
-<table class="table table-hover align-middle">
-  <thead class="table-light">
-    <tr>
-      <th>#</th>
-      <th>Date</th>
-      <th>Customer</th>
-      <th class="text-end">Total</th>
-      <th>Status</th>
-      <th class="text-end">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for o in orders %}
-    <tr>
-      <td>{{ o.id }}</td>
-      <td>{{ o.created_at|date:"Y-m-d" }}</td>
-      <td>{{ o.customer }}</td>
-      <td class="text-end">{{ o.total_amount|floatformat:2 }}</td>
-      <td>
-        {% if o.status == 'new' %}
-           <span class="badge bg-secondary">New</span>
-        {% elif o.status == 'proc' %}
-           <span class="badge bg-info">Processing</span>
-        {% elif o.status == 'ship' %}
-           <span class="badge bg-warning text-dark">Shipped</span>
-        {% elif o.status == 'done' %}
-           <span class="badge bg-success">Completed</span>
-        {% else %}
-           <span class="badge bg-danger">Canceled</span>
-        {% endif %}
-      </td>
-      <td class="text-end">
-        <a href="{% url 'orders:detail' o.pk %}" class="btn btn-sm btn-outline-info" title="View">
-            <i class="fas fa-eye"></i>
-        </a>
-        <a href="{% url 'orders:update' o.pk %}" class="btn btn-sm btn-outline-primary" title="Edit">
-            <i class="fas fa-edit"></i>
-        </a>
-        <a href="{% url 'orders:delete' o.pk %}" class="btn btn-sm btn-outline-danger" title="Delete">
-            <i class="fas fa-trash-alt"></i>
-        </a>
-      </td>
-    </tr>
-  {% empty %}
-    <tr>
-      <td colspan="6" class="text-center py-4 text-muted">No orders found.</td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th class="text-end">Total</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                <tr>
+                    <td>
+                        <span class="order-id">#{{ o.id }}</span>
+                    </td>
+                    <td>{{ o.created_at|date:"M d, Y" }}</td>
+                    <td>{{ o.customer }}</td>
+                    <td class="text-end">${{ o.total_amount|floatformat:2 }}</td>
+                    <td>
+                        {% if o.status == 'new' %}
+                            <span class="status-badge new">New</span>
+                        {% elif o.status == 'proc' %}
+                            <span class="status-badge processing">Processing</span>
+                        {% elif o.status == 'ship' %}
+                            <span class="status-badge shipped">Shipped</span>
+                        {% elif o.status == 'done' %}
+                            <span class="status-badge completed">Completed</span>
+                        {% else %}
+                            <span class="status-badge canceled">Canceled</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'orders:detail' o.pk %}" class="btn btn-sm btn-outline-info" title="View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'orders:update' o.pk %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'orders:delete' o.pk %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i class="fas fa-shopping-cart"></i>
+                            <p>No orders found.</p>
+                            <a href="{% url 'orders:create' %}" class="btn btn-primary">Add Order</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

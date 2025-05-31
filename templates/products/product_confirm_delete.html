@@ -1,28 +1,126 @@
 {% extends "core/base.html" %}
 
-{% block title %}“{{ product.name }}” ni o‘chirish{% endblock %}
+{% block title %}Delete "{{ product.name }}" - Kiyim-Kechak CRM{% endblock %}
 
 {% block breadcrumb %}
   {% include "core/breadcrumb.html" with here="Delete product" %}
 {% endblock %}
 
-{% block content %}
-<div class="card p-4 shadow-sm" style="max-width:600px">
-  <h3 class="mb-3 text-danger">
-    “{{ product.name }}” mahsulotini o‘chirib tashlamoqchimisiz?
-  </h3>
-  <p class="text-muted mb-4">
-    Diqqat: bu amal qaytarib bo‘lmaydi!
-  </p>
+{% block extra_css %}
+<style>
+    .delete-container {
+        max-width: 600px;
+        margin: 2rem auto;
+    }
 
-  <form method="post">
-    {% csrf_token %}
-    <a href="{% url 'products:detail' product.pk %}" class="btn btn-secondary">
-      Bekor qilish
-    </a>
-    <button type="submit" class="btn btn-danger">
-      Ha, o‘chir!
-    </button>
-  </form>
+    .delete-card {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .delete-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ef4444, #f87171);
+    }
+
+    .delete-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ef4444;
+        margin-bottom: 1rem;
+    }
+
+    .delete-warning {
+        color: var(--text-light);
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .product-info {
+        background: #fef2f2;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid #ef4444;
+    }
+
+    .product-info p {
+        margin: 0.5rem 0;
+        font-size: 0.875rem;
+    }
+
+    .product-info strong {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .delete-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+    }
+
+    .warning-icon {
+        font-size: 3rem;
+        color: #ef4444;
+        margin-bottom: 1rem;
+        display: block;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <div class="delete-card">
+        <i class="fas fa-exclamation-triangle warning-icon"></i>
+
+        <h3 class="delete-title">
+            "{{ product.name }}" mahsulotini o'chirib tashlamoqchimisiz?
+        </h3>
+
+        <p class="delete-warning">
+            Diqqat: bu amal qaytarib bo'lmaydi! Mahsulot bilan bog'liq barcha ma'lumotlar o'chiriladi.
+        </p>
+
+        <div class="product-info">
+            <p><strong>Nomi:</strong> {{ product.name }}</p>
+            <p><strong>Kategoriya:</strong> {{ product.category.name }}</p>
+            <p><strong>Narxi:</strong> ${{ product.price }}</p>
+            <p><strong>Soni:</strong> {{ product.stock_quantity }}</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="delete-actions">
+                <a href="{% url 'products:detail' product.pk %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Bekor qilish
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Ha, o'chirish
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

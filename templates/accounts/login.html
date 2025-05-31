@@ -1,39 +1,264 @@
-{% extends 'core/base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Kiyim-Kechak CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #10b981;
+            --primary-green-dark: #059669;
+            --primary-green-light: #34d399;
+            --secondary-green: #065f46;
+            --light-green: #ecfdf5;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
 
-{% block title %}Login{% endblock %}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <h2>Login to CRM</h2>
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="{{ form.username.id_for_label }}">Username</label>
-                {{ form.username }}
-                {% if form.username.errors %}
-                    <div class="error">{{ form.username.errors }}</div>
-                {% endif %}
-            </div>
-            <div class="form-group">
-                <label for="{{ form.password.id_for_label }}">Password</label>
-                {{ form.password }}
-                {% if form.password.errors %}
-                    <div class="error">{{ form.password.errors }}</div>
-                {% endif %}
-            </div>
-            {% if form.non_field_errors %}
-                <div class="error">
-                    {% for error in form.non_field_errors %}
-                        {{ error }}
-                    {% endfor %}
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-card {
+            background: var(--white);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--primary-green-light));
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: var(--white);
+            font-size: 2rem;
+        }
+
+        .auth-card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-subtitle {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.875rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background-color: var(--white);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .error {
+            color: #ef4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            color: var(--white);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-green-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .auth-links p {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .auth-links a {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-links a:hover {
+            color: var(--primary-green-dark);
+            text-decoration: underline;
+        }
+
+        /* Animation */
+        .auth-card {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-tshirt"></i>
                 </div>
-            {% endif %}
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-        <div class="auth-links">
-            <p>Don't have an account? <a href="{% url 'accounts:signup' %}">Sign up</a></p>
+                <h2>Welcome Back</h2>
+                <p class="auth-subtitle">Sign in to your Kiyim-Kechak CRM account</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="form-group">
+                        <div class="error">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}">
+                        <i class="fas fa-user" style="margin-right: 0.5rem; color: var(--primary-green);"></i>
+                        Username
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="error">{{ form.username.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}">
+                        <i class="fas fa-lock" style="margin-right: 0.5rem; color: var(--primary-green);"></i>
+                        Password
+                    </label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="error">{{ form.password.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+            </form>
+
+            <div class="auth-links">
+                <p>Don't have an account? <a href="{% url 'accounts:signup' %}">Create one here</a></p>
+            </div>
         </div>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>

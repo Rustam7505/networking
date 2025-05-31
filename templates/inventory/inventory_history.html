@@ -1,38 +1,217 @@
 {% extends 'core/base.html' %}
-{% block title %}Inventory history{% endblock %}
-{% block breadcrumb %}{% include 'core/breadcrumb.html' with here='History' %}{% endblock %}
+
+{% block title %}Inventory History - Kiyim-Kechak CRM{% endblock %}
+
+{% block breadcrumb %}
+    {% include 'core/breadcrumb.html' with here='History' %}
+{% endblock %}
+
 {% load inventory_extras %}
 
+{% block extra_css %}
+<style>
+    .history-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .product-info {
+        background: var(--light-green);
+        border-radius: 0.75rem;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--primary-green);
+    }
+
+    .product-info h3 {
+        margin: 0;
+        color: var(--secondary-green);
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    /* Table */
+    .table-responsive {
+        background: var(--white);
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table thead {
+        background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+        color: var(--white);
+    }
+
+    .data-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .data-table th.text-end {
+        text-align: right;
+    }
+
+    .data-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--gray-200);
+        vertical-align: middle;
+    }
+
+    .data-table td.text-end {
+        text-align: right;
+    }
+
+    .data-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .change-positive {
+        color: var(--primary-green);
+        font-weight: 600;
+    }
+
+    .change-negative {
+        color: #ef4444;
+        font-weight: 600;
+    }
+
+    .change-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .change-badge.positive {
+        background: var(--light-green);
+        color: var(--secondary-green);
+    }
+
+    .change-badge.positive::before {
+        content: '+';
+        margin-right: 0.25rem;
+    }
+
+    .change-badge.negative {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--gray-300);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        font-size: 1.125rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            min-width: 600px;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h2 class="mb-3">{% load inventory_extras %}
+<div class="history-container">
+    <div class="page-header">
+        <h2>
+            {% if product %}
+                Inventory History – {{ product }}
+            {% else %}
+                Inventory History
+            {% endif %}
+        </h2>
+    </div>
 
-  {% if product %}History – {{ product }}{% else %}Inventory history{% endif %}
-</h2>
+    {% if product %}
+    <div class="product-info">
+        <h3>{{ product }}</h3>
+    </div>
+    {% endif %}
 
-<div class="table-responsive">
-<table class="table table-striped align-middle">
-  <thead class="table-light">
-    <tr>
-      <th>#</th><th>Date</th><th>{% if not product %}Product{% endif %}</th>
-      <th class="text-end">Δ Qty</th><th>Note</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for h in history %}
-    <tr>
-      <td>{{ forloop.counter }}</td>
-      <td>{{ h.timestamp|date:"Y-m-d H:i" }}</td>
-      {% if not product %}<td>{{ h.product }}</td>{% endif %}
-      <td class="text-end {{ h.change|intgte:0|yesno:'text-success,text-danger' }}">
-         {{ h.change|floatformat:0 }}
-      </td>
-      <td>{{ h.note|default:"—" }}</td>
-    </tr>
-  {% empty %}
-    <tr><td colspan="5" class="text-center py-4 text-muted">No history.</td></tr>
-  {% endfor %}
-  </tbody>
-</table>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    {% if not product %}<th>Product</th>{% endif %}
+                    <th class="text-end">Quantity Change</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in history %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ h.timestamp|date:"M d, Y H:i" }}</td>
+                    {% if not product %}
+                        <td>{{ h.product }}</td>
+                    {% endif %}
+                    <td class="text-end">
+                        <span class="change-badge {% if h.change >= 0 %}positive{% else %}negative{% endif %}">
+                            {{ h.change|floatformat:0 }}
+                        </span>
+                    </td>
+                    <td>{{ h.note|default:"—" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if product %}4{% else %}5{% endif %}">
+                        <div class="empty-state">
+                            <i class="fas fa-history"></i>
+                            <p>No history available.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

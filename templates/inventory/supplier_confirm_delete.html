@@ -1,19 +1,160 @@
 {% load inventory_extras %}
 
 {% extends 'core/base.html' %}
-{% block title %}Delete supplier{% endblock %}
-{% block breadcrumb %}{% include 'core/breadcrumb.html' with here='Delete' %}{% endblock %}
 
+{% block title %}Delete Supplier - {{ supplier.name }}{% endblock %}
+
+{% block breadcrumb %}
+    {% include 'core/breadcrumb.html' with here='Delete' %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        max-width: 600px;
+        margin: 2rem auto;
+    }
+
+    .delete-card {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .delete-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ef4444, #f87171);
+    }
+
+    .delete-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ef4444;
+        margin-bottom: 1rem;
+    }
+
+    .delete-warning {
+        color: var(--text-light);
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .supplier-info {
+        background: #fef2f2;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid #ef4444;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .supplier-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--primary-green);
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .supplier-details h4 {
+        margin: 0 0 0.5rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .supplier-details p {
+        margin: 0.25rem 0;
+        font-size: 0.875rem;
+        color: var(--text-light);
+    }
+
+    .delete-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+    }
+
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #4b5563;
+    }
+
+    .warning-icon {
+        font-size: 3rem;
+        color: #ef4444;
+        margin-bottom: 1rem;
+        display: block;
+        text-align: center;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h2 class="text-danger mb-3">Delete “{{ supplier.name }}”?</h2>
+<div class="delete-container">
+    <div class="delete-card">
+        <i class="fas fa-exclamation-triangle warning-icon"></i>
 
-<p>Bu yetkazib beruvchini o‘chirib tashlasangiz, unga bog‘liq mahsulotlar saqlanib qoladi, lekin
-supplier maydoni bo‘sh bo‘ladi.</p>
+        <h2 class="delete-title">Delete "{{ supplier.name }}"?</h2>
 
-<form method="post">
-  {% csrf_token %}
-  <a href="{% url 'inventory:supplier_list' %}" class="btn btn-secondary">Cancel</a>
-  <button class="btn btn-danger">Yes, delete</button>
-</form>
+        <p class="delete-warning">
+            Bu yetkazib beruvchini o'chirib tashlasangiz, unga bog'liq mahsulotlar saqlanib qoladi, lekin
+            supplier maydoni bo'sh bo'ladi.
+        </p>
+
+        <div class="supplier-info">
+            <div class="supplier-avatar">
+                {{ supplier.name|first|upper }}
+            </div>
+            <div class="supplier-details">
+                <h4>{{ supplier.name }}</h4>
+                <p><strong>Phone:</strong> {{ supplier.phone|default:"Not provided" }}</p>
+                <p><strong>Email:</strong> {{ supplier.email|default:"Not provided" }}</p>
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="delete-actions">
+                <a href="{% url 'inventory:supplier_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Yes, delete
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

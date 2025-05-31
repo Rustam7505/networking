@@ -1,40 +1,265 @@
 {% extends 'core/base.html' %}
-{% load report_extras %}   {#  ← qo‘shimcha #}
-{% block title %}Inventory report – {{ report_date }}{% endblock %}
+
+{% block title %}Inventory Report - {{ report_date }} - Kiyim-Kechak CRM{% endblock %}
+
+{% block breadcrumb %}
+    {% include 'core/breadcrumb.html' with here='Inventory Report' %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .report-date {
+        color: var(--text-light);
+        font-size: 1rem;
+        margin-top: 0.25rem;
+    }
+
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-card {
+        background: var(--white);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        text-align: center;
+    }
+
+    .summary-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--primary-green);
+    }
+
+    .summary-label {
+        color: var(--text-light);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .table-card {
+        background: var(--white);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        position: relative;
+    }
+
+    .table-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--primary-green-light));
+    }
+
+    .table-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--gray-200);
+        background: var(--gray-50);
+    }
+
+    .table-header h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .custom-table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .custom-table thead th {
+        background: var(--gray-50);
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 1rem 1.5rem;
+        border: none;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .custom-table tbody td {
+        padding: 1rem 1.5rem;
+        border: none;
+        border-bottom: 1px solid var(--gray-100);
+        color: var(--text-dark);
+        font-size: 0.875rem;
+    }
+
+    .custom-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    .custom-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .quantity-value {
+        color: var(--primary-green);
+        font-weight: 600;
+    }
+
+    .export-btn {
+        background: var(--white);
+        border: 1px solid var(--gray-300);
+        color: var(--text-dark);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .export-btn:hover {
+        background: var(--gray-50);
+        border-color: var(--primary-green);
+        color: var(--primary-green);
+        text-decoration: none;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-light);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--gray-300);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .summary-cards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .custom-table {
+            font-size: 0.75rem;
+        }
+
+        .custom-table thead th,
+        .custom-table tbody td {
+            padding: 0.75rem 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .summary-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h2 class="mb-3">Inventory report – {{ report_date }}</h2>
+<div class="page-header">
+    <div>
+        <h2>Inventory Report</h2>
+        <div class="report-date">{{ report_date }}</div>
+    </div>
+    <a href="#" class="export-btn">
+        <i class="fas fa-download"></i>
+        Export Data
+    </a>
+</div>
 
-<table class="table table-sm table-striped">
-  <thead>
-    <tr>
-      <th>#</th><th>Product</th>
-      <th class="text-end">Opening</th>
-      <th class="text-end">+ Added</th>
-      <th class="text-end">– Removed</th>
-      <th class="text-end">Closing</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for row in opening %}
-    {% with mov=movement|get_item:row.product_id %}
-    {% comment %} 'get_item' – template filter yozib qo‘ying yoki Python’da merge qiling {% endcomment %}
-    {% with
-         added=mov.added|default:0
-         removed=mov.removed|default:0
-         closing=row.opening_qty|add:added|add:removed %}
-    <tr>
-      <td>{{ forloop.counter }}</td>
-      <td>{{ row.product__name }}</td>
-      <td class="text-end">{{ row.opening_qty|floatformat }}</td>
-      <td class="text-end text-success">{{ added|floatformat }}</td>
-      <td class="text-end text-danger">{{ removed|floatformat }}</td>
-      <td class="text-end fw-bold">{{ closing|floatformat }}</td>
-    </tr>
-    {% endwith %}
-  {% empty %}
-    <tr><td colspan="6" class="text-center py-4 text-muted">No data.</td></tr>
-  {% endfor %}
-  </tbody>
-</table>
+<!-- Summary Cards -->
+<div class="summary-cards">
+    <div class="summary-card">
+        <div class="summary-value">{{ total_received|default:"0" }}</div>
+        <div class="summary-label">Total Received</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value">{{ opening|length|default:"0" }}</div>
+        <div class="summary-label">Total Records</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value">{{ total_added|default:"0" }}</div>
+        <div class="summary-label">Items Added</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value">{{ total_removed|default:"0" }}</div>
+        <div class="summary-label">Items Removed</div>
+    </div>
+</div>
+
+<!-- Table Card -->
+<div class="table-card">
+    <div class="table-header">
+        <h3>Inventory Records</h3>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>Supplier</th>
+                    <th class="text-end">Quantity Received</th>
+                    <th>Date Received</th>
+                    <th>Invoice #</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in inventory_data %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><strong>{{ item.product_name }}</strong></td>
+                    <td>{{ item.supplier_name }}</td>
+                    <td class="text-end">
+                        <span class="quantity-value">{{ item.quantity_received|floatformat }}</span>
+                    </td>
+                    <td>{{ item.date_received|date:"M d, Y"|default:"N/A" }}</td>
+                    <td>{{ item.invoice_number }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        <i class="fas fa-warehouse"></i>
+                        <div>No inventory data available</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

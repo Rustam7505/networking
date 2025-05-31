@@ -1,35 +1,282 @@
 {% extends 'core/base.html' %}
-{% block title %}Profit report{% endblock %}
-{% block breadcrumb %}{% include 'core/breadcrumb.html' with here='Profit report' %}{% endblock %}
+
+{% block title %}Profit Report - Kiyim-Kechak CRM{% endblock %}
+
+{% block breadcrumb %}
+    {% include 'core/breadcrumb.html' with here='Profit Report' %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-card {
+        background: var(--white);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        text-align: center;
+    }
+
+    .summary-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .summary-value.revenue {
+        color: var(--primary-green);
+    }
+
+    .summary-value.cost {
+        color: #ef4444;
+    }
+
+    .summary-value.profit {
+        color: #d97706;
+    }
+
+    .summary-label {
+        color: var(--text-light);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .table-card {
+        background: var(--white);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        position: relative;
+    }
+
+    .table-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #d97706, #fbbf24);
+    }
+
+    .table-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--gray-200);
+        background: var(--gray-50);
+    }
+
+    .table-header h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .custom-table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .custom-table thead th {
+        background: var(--gray-50);
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 1rem 1.5rem;
+        border: none;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .custom-table tbody td {
+        padding: 1rem 1.5rem;
+        border: none;
+        border-bottom: 1px solid var(--gray-100);
+        color: var(--text-dark);
+        font-size: 0.875rem;
+    }
+
+    .custom-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    .custom-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .revenue-amount {
+        color: var(--primary-green);
+        font-weight: 600;
+    }
+
+    .cost-amount {
+        color: #ef4444;
+        font-weight: 600;
+    }
+
+    .profit-positive {
+        color: var(--primary-green);
+        font-weight: 700;
+    }
+
+    .profit-negative {
+        color: #ef4444;
+        font-weight: 700;
+    }
+
+    .export-btn {
+        background: var(--white);
+        border: 1px solid var(--gray-300);
+        color: var(--text-dark);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .export-btn:hover {
+        background: var(--gray-50);
+        border-color: #d97706;
+        color: #d97706;
+        text-decoration: none;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-light);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--gray-300);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .summary-cards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .custom-table {
+            font-size: 0.75rem;
+        }
+
+        .custom-table thead th,
+        .custom-table tbody td {
+            padding: 0.75rem 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .summary-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h2 class="mb-3">Profit report</h2>
+<div class="page-header">
+    <h2>Profit & Loss Report</h2>
+    <a href="#" class="export-btn">
+        <i class="fas fa-download"></i>
+        Export Data
+    </a>
+</div>
 
-<div class="table-responsive">
-  <table class="table table-striped align-middle">
-    <thead class="table-light small">
-      <tr>
-        <th>#</th><th>Date</th>
-        <th class="text-end">Revenue</th>
-        <th class="text-end">Cost</th>
-        <th class="text-end">Profit</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for r in profits %}
-      <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ r.date|date:"Y-m-d" }}</td>
-        <td class="text-end">{{ r.revenue|floatformat:2 }}</td>
-        <td class="text-end">{{ r.cost|floatformat:2 }}</td>
-        <td class="text-end fw-bold {% if r.profit >= 0 %}text-success{% else %}text-danger{% endif %}">
-            {{ r.profit|floatformat:2 }}
-        </td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="5" class="text-center py-4 text-muted">No data.</td></tr>
-    {% endfor %}
-    </tbody>
-  </table>
+<!-- Summary Cards -->
+<div class="summary-cards">
+    <div class="summary-card">
+        <div class="summary-value revenue">${{ total_revenue|floatformat:0|default:"0" }}</div>
+        <div class="summary-label">Total Revenue</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value cost">${{ total_cost|floatformat:0|default:"0" }}</div>
+        <div class="summary-label">Total Cost</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value profit">${{ total_profit|floatformat:0|default:"0" }}</div>
+        <div class="summary-label">Net Profit</div>
+    </div>
+</div>
+
+<!-- Table Card -->
+<div class="table-card">
+    <div class="table-header">
+        <h3>Daily Profit & Loss</h3>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th class="text-end">Revenue</th>
+                    <th class="text-end">Cost</th>
+                    <th class="text-end">Profit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in profits %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ r.date|date:"M d, Y" }}</td>
+                    <td class="text-end">
+                        <span class="revenue-amount">${{ r.revenue|floatformat:2 }}</span>
+                    </td>
+                    <td class="text-end">
+                        <span class="cost-amount">${{ r.cost|floatformat:2 }}</span>
+                    </td>
+                    <td class="text-end">
+                        <span class="{% if r.profit >= 0 %}profit-positive{% else %}profit-negative{% endif %}">
+                            ${{ r.profit|floatformat:2 }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state">
+                        <i class="fas fa-coins"></i>
+                        <div>No profit data available</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
